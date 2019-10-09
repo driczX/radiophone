@@ -1,7 +1,7 @@
-import 'package:testing/bsp_service/bsp_service_bloc.dart';
-import 'package:testing/bsp_service/bsp_service_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_search_bar/loader_search_bar.dart';
+import 'package:testing/bsp_service/bsp_service_bloc.dart';
+import 'package:testing/bsp_service/bsp_service_screen.dart';
 
 class BspServicePage extends StatefulWidget {
   static const String routeName = "/bspService";
@@ -18,6 +18,14 @@ class _BspServicePageState extends State<BspServicePage> {
   List<int> servicesIds = [];
   Map<String, bool> selection = {};
 
+  SearchBarController _controller = new SearchBarController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   void _showErrorDialog(String message) {
     showDialog(
       barrierDismissible: false,
@@ -31,17 +39,26 @@ class _BspServicePageState extends State<BspServicePage> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-          )
+          ),
         ],
       ),
     );
   }
+
+  String searchText = '';
 
   @override
   Widget build(BuildContext context) {
     var _bspServiceBloc = new BspServiceBloc();
     return new Scaffold(
       appBar: SearchBar(
+        controller: _controller,
+        onQueryChanged: (String query) {
+          print('Search Query $query');
+          setState(() {
+            searchText = query;
+          });
+        },
         defaultBar: AppBar(
           leading: IconButton(
               icon: Icon(Icons.arrow_back_ios),
@@ -51,10 +68,11 @@ class _BspServicePageState extends State<BspServicePage> {
           title: Text('Select Services'),
         ),
       ),
-      body: new BspServiceScreen(
+      body: BspServiceScreen(
         bspServiceBloc: _bspServiceBloc,
         servicesIds: servicesIds,
         selection: selection,
+        searchQuery: searchText,
       ),
       bottomNavigationBar: Container(
         height: 56,
