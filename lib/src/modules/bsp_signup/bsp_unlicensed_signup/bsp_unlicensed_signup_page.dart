@@ -6,11 +6,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_licensed_signup_terms/bsp_licensed_signup_terms_page.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
 import 'package:tudo/src/styles/colors.dart';
 import 'package:tudo/src/utils/app_constants_value.dart';
-
 import 'package:tudo/src/utils/navigation_helper.dart';
 import 'package:tudo/src/utils/validator.dart';
 import 'package:tudo/src/widgets/tudo_selection_widget/TudoConditionWidget.dart';
@@ -35,6 +33,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   List<Object> images = List<Object>();
   Future<File> _imageFile;
+
   @override
   void initState() {
     super.initState();
@@ -63,11 +62,13 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   final format = DateFormat("yyyy-MM-dd");
   final format2 = DateFormat("yyyy-MM-dd");
-  final TextEditingController clrbusinesslicense = TextEditingController();
+
+  /* final TextEditingController clrbusinesslicense = TextEditingController();
   final TextEditingController clrbusinesslicense2 = TextEditingController();
   final TextEditingController clrissuingauthority = TextEditingController();
-  final TextEditingController clrissuingauthority2 = TextEditingController();
-  String _licenseno;
+  final TextEditingController clrissuingauthority2 = TextEditingController();*/
+
+  /* String _licenseno;
   String _licenseno2;
   String _illusingauthority;
   String _illusingauthority2;
@@ -79,7 +80,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     'Ration Card',
     'Aadhar',
     'Other Id',
-  ];
+  ];*/
   String type2 = 'Passport';
   List<String> _type = <String>[
     '',
@@ -91,7 +92,8 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     'Other Id',
   ];
   String type = 'Passport';
-  Map<String, String> _formdata = {};
+
+//  Map<String, String> _formdata = {};
   var _myWidgets = List<Widget>();
   int _index = 3;
   final Map<int, String> identification1Values = Map();
@@ -99,26 +101,25 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   final Map<int, DateTime> expiryDateValues = Map();
   final Map<int, String> issuingAuthority = Map();
   final Map<int, String> identificationPicturesValues = Map();
-  final List<TextEditingController> _controllers = List();
 
   final List<TextEditingController> _documentControllers = List();
   final List<TextEditingController> _issuingauthoritytype = List();
   final List<TextEditingController> _expiryDate = List();
   final List<TextEditingController> _issuingauthority = List();
-  final List<TextEditingController> _identificationpictures = List();
+  final List<List<Object>> _identificationpictures = List();
+
   void _add() {
-    TextEditingController controller = TextEditingController();
-    _controllers.add(controller);
+//    TextEditingController controller = TextEditingController();
     int keyValue = _index;
     _myWidgets = List.from(_myWidgets)
       ..add(Column(
-        key: Key("${keyValue}"),
+        key: Key("$keyValue"),
         children: <Widget>[
-          _buildidentificationtype1(keyValue, controller),
-          _builddocumentnumber1(keyValue, controller),
-          _buildexpirydate1(keyValue, controller),
-          _buildissuingauthority1(keyValue, controller),
-          _buildidentificationpictures(keyValue, controller),
+          _buildidentificationtype1(keyValue),
+          _builddocumentnumber1(keyValue),
+          _buildexpirydate1(keyValue),
+          _buildissuingauthority1(keyValue),
+          _buildidentificationpictures(keyValue),
           _buildinformationislegitmate(keyValue),
         ],
       ));
@@ -127,15 +128,15 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   }
 
   bool isClicked = false;
-  _add1() {
+
+  /*_add1() {
     setState(() {
       isClicked = true;
       ++_index;
     });
-  }
+  }*/
 
-  Widget _buildidentificationtype1(
-      int keyValue, TextEditingController controller) {
+  Widget _buildidentificationtype1(int keyValue) {
     TextEditingController controller = TextEditingController();
     _issuingauthoritytype.add(controller);
     print("------------------Reports--------------------");
@@ -167,7 +168,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     isDense: true,
                     onChanged: (String newValue) {
                       setState(() {
-                        type = identification1Values[keyValue] = newValue;
+                        type = controller.text = newValue;
                         field.didChange(newValue);
                       });
                     },
@@ -187,7 +188,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     );
   }
 
-  Widget _builddocumentnumber1(int keyValue, TextEditingController controller) {
+  Widget _builddocumentnumber1(int keyValue) {
     TextEditingController controller = TextEditingController();
     _documentControllers.add(controller);
     return new TudoTextWidget(
@@ -207,7 +208,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     );
   }
 
-  Widget _buildexpirydate1(int keyValue, TextEditingController controller) {
+  Widget _buildexpirydate1(int keyValue) {
     TextEditingController controller = TextEditingController();
     _expiryDate.add(controller);
     return FormField(builder: (FormFieldState state) {
@@ -222,10 +223,11 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
               initialDate: expiryDateValues[keyValue] = expirydate1,
               firstDate: DateTime(1900),
               lastDate: DateTime.now());
+          print(picked);
           if (picked != null && picked != expirydate1)
             setState(() {
-              expiryDateValues[keyValue] = expirydate1;
               expirydate1 = picked;
+              controller.text = expirydate1.toIso8601String();
               print(expirydate1);
             });
         },
@@ -233,8 +235,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     });
   }
 
-  Widget _buildissuingauthority1(
-      int keyValue, TextEditingController controller) {
+  Widget _buildissuingauthority1(int keyValue) {
     TextEditingController controller = TextEditingController();
     _issuingauthority.add(controller);
     return new TudoTextWidget(
@@ -254,10 +255,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     );
   }
 
-  Widget _buildidentificationpictures(
-      int keyValue, TextEditingController controller) {
-    TextEditingController controller = TextEditingController();
-    _identificationpictures.add(controller);
+  Widget _buildidentificationpictures(int keyValue) {
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 5,
@@ -286,6 +284,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     onTap: () {
                       setState(() {
                         images.replaceRange(index, index + 1, ['Add Image']);
+                        _identificationpictures.add(images);
                       });
                     },
                   ),
@@ -377,11 +376,22 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
               onPressed: () async {
                 if (_formKey.currentState.validate()) {
                   BspSignupCommonModel model = widget.bspSignupCommonModel;
-                  Navigator.push(
+                  for (var i = 0; i < _myWidgets.length; i++) {
+                    String document = _documentControllers[i].text;
+                    String issuingAuthorityType = _issuingauthoritytype[i].text;
+                    String expiryDate = _expiryDate[i].text;
+                    String issuingAuthority = _issuingauthority[i].text;
+//                    String picture = _identificationpictures[i].text;
+                    print(
+                        'Document: $document\nIssuingAuthorityType: $issuingAuthorityType'
+                        '\nExpiryDate: $expiryDate\nIssuingAuthority: $issuingAuthority'
+                        '\nPicture: ${_identificationpictures.length}');
+                  }
+                  /* Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => BspLicensedSignupTermsPage(
-                              bspSignupCommonModel: model)));
+                              bspSignupCommonModel: model)));*/
                 }
               }),
         ],
