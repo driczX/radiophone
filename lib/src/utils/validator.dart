@@ -82,12 +82,13 @@ class Validators {
     var date = new DateTime.now();
     int currentYear = date.year;
     int userinputValue = 0;
-    print('currentYear = $currentYear');
-    print('input value = $value');
-    print('value = ${value is int}');
-    print('value = ${value is String}');
+
+    String patttern = r'(^[0-9]*$)';
+    RegExp regExp = new RegExp(patttern);
     // int numValue = int.parse(value);
-    if (value is String && value.length == 0) {
+    if (!regExp.hasMatch(value)) {
+      return "Year must be number only";
+    } else if (value is String && value.length == 0) {
       return "Established Year is Required";
     } else {
       userinputValue = int.parse(value);

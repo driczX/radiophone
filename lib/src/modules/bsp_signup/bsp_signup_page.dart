@@ -1,3 +1,4 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
@@ -6,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_map_location_picker/google_map_location_picker.dart';
 
 import 'package:redux/redux.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_repository.dart';
@@ -34,7 +34,8 @@ class BspSignupPage extends StatefulWidget {
   _BspSignupPageState createState() => _BspSignupPageState();
 }
 
-class _BspSignupPageState extends State<BspSignupPage> {
+class _BspSignupPageState extends State<BspSignupPage>
+    with AfterLayoutMixin<BspSignupPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // final TextEditingController _bspPhone = TextEditingController();
   final MaskedTextController _bspPhone =
@@ -68,17 +69,13 @@ class _BspSignupPageState extends State<BspSignupPage> {
   DateTime date;
   TimeOfDay time;
   Map<String, dynamic> bspsignupdata = new Map<String, dynamic>();
+  bool autovalidate = false;
 
   @override
   void initState() {
     super.initState();
+    print(model);
     _bspNumberOfEmployee.text = "1";
-    SharedPreferences.getInstance().then((pref) {
-      String bspModel = pref.getString('bspModel');
-      if (bspModel != null) {
-        _setExistingDetails(bspModel);
-      }
-    });
     _bspSignupRepository.getBSTypes().then((businessTypeResponse) {
       print('businessTypeResponse');
       print(businessTypeResponse);
@@ -95,9 +92,30 @@ class _BspSignupPageState extends State<BspSignupPage> {
     });
   }
 
+  @override
+  void afterFirstLayout(BuildContext context) {
+    model = ModalRoute.of(context).settings.arguments;
+    if (model == null) {
+      model = new BspSignupCommonModel();
+    } else {
+      print('model for edit');
+      _setExistingDetails(model);
+    }
+  }
+
   void _setExistingDetails(bspModel) {
-    model = bspSignupCommonModelFromJson(bspModel);
-    _bspBusinessName.text = model.businessLegalName;
+    _bspBusinessName.text = bspModel.businessLegalName;
+    _bspPhone.text = model.businessPhoneNumber;
+    _bspEstYear.text = model.businessYear;
+    _bspNumberOfEmployee.text = model.numberofEmployees;
+    _bspBusinessLegalAddress.text = model.businessLegalAddress;
+    _typeValue = model.businessTypes;
+    // List setTypes = _type.where((bspTypeList) {
+    //   return bspTypeList['id'] == model.businessType;
+    // });
+    // print('setTypes');
+    // print(setTypes);
+    // _typeValue = setTypes[0];
   }
 
   Widget _buildlegalbusinessname() {
@@ -241,7 +259,7 @@ class _BspSignupPageState extends State<BspSignupPage> {
 
   Widget _buildbusinesstype() {
     return FormBuilder(
-      autovalidate: true,
+      autovalidate: autovalidate,
       child: FormBuilderCustomField(
           attribute: "Business type",
           validators: [FormBuilderValidators.required()],
@@ -252,13 +270,14 @@ class _BspSignupPageState extends State<BspSignupPage> {
                   prefixIcon: Icon(Icons.perm_identity),
                   labelText: _type == []
                       ? 'Select Personal Identification type'
-                      : ' Business type',
+                      : 'Business type',
                   hintText: "Select Personal Identification type",
                   errorText: field.errorText,
                 ),
-                isEmpty: _type == [],
+                isEmpty: _typeValue == [],
                 child: new DropdownButtonHideUnderline(
                   child: new DropdownButton(
+                    // isExpanded: true,
                     hint: Text("Select Personal Identification type"),
                     value: _typeValue,
                     isDense: true,
@@ -346,6 +365,9 @@ class _BspSignupPageState extends State<BspSignupPage> {
               borderRadius: BorderRadius.circular(7),
             ),
             onPressed: () async {
+              setState(() {
+                autovalidate = !autovalidate;
+              });
               if (_formKey.currentState.validate()) {
                 model.businessLegalName = _bspBusinessName.text;
                 model.businessPhoneNumber = _bspPhone.text;
@@ -353,6 +375,9 @@ class _BspSignupPageState extends State<BspSignupPage> {
                 model.numberofEmployees = _bspNumberOfEmployee.text;
                 model.businessType = _typeValue['id'];
                 model.businessLegalAddress = _bspBusinessLegalAddress.text;
+                model.businessTypes = _typeValue;
+                print('model');
+                print(model.licensed);
                 if (_typeValue['name'].toLowerCase() ==
                     "Licensed / Registered".toLowerCase()) {
                   model.isLicensed = true;
@@ -388,7 +413,7 @@ class _BspSignupPageState extends State<BspSignupPage> {
         height: double.infinity,
         width: double.infinity,
         child: Form(
-          autovalidate: true,
+          autovalidate: autovalidate,
           key: _formKey,
           child: Stack(
             children: <Widget>[

@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_service/index.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart'
-    as BspServices;
-import './bsp_service_model.dart' as ServiceList;
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_bloc.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_event.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_model.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_state.dart';
 
 class BspServiceScreen extends StatefulWidget {
   final BspServiceBloc _bspServiceBloc;
   final String searchQuery;
   final List<int> servicesIds;
   final Map<String, bool> selection;
-  final BspSignupCommonModel bspSignupCommonModel;
-  final List<BspServices.Service> selectedServices;
-  final Function refresh;
 
   const BspServiceScreen({
     Key key,
     @required BspServiceBloc bspServiceBloc,
-    @required this.bspSignupCommonModel,
     @required this.servicesIds,
     @required this.selection,
-    @required this.selectedServices,
-    @required this.refresh,
     this.searchQuery,
   })  : _bspServiceBloc = bspServiceBloc,
         super(key: key);
@@ -37,20 +30,13 @@ class BspServiceScreenState extends State<BspServiceScreen> {
   final BspServiceBloc _bspServiceBloc;
 
   BspServiceScreenState(this._bspServiceBloc);
+
   // Map<String, bool> _selection = {};
 
   @override
   void initState() {
     super.initState();
-    bool isHome = widget.bspSignupCommonModel.isHome;
-    bool isWalkIn = widget.bspSignupCommonModel.isWalkin;
-    bool isOnDemand = widget.bspSignupCommonModel.isOnDemand;
-    this._bspServiceBloc.dispatch(LoadBspServiceEvent(
-          countryId: 1,
-          isHome: isHome,
-          isOnDemand: isOnDemand,
-          isWalkin: isWalkIn,
-        ));
+    this._bspServiceBloc.dispatch(LoadBspServiceEvent());
   }
 
   @override
@@ -77,20 +63,9 @@ class BspServiceScreenState extends State<BspServiceScreen> {
           );
         }
         if (currentState is InBspServiceState) {
-          // print(
-          //     'in bsp service state, ${currentState.bspServices.servicesByCountry.length}');
-          if (currentState.bspServices.servicesByCountry.length == 0) {
-            return Container(
-              child: Center(
-                child: Text("No Services available for this combination"),
-              ),
-            );
-          } else {
-            return new Container(
-              child:
-                  _renderServices(currentState.bspServices.servicesByCountry),
-            );
-          }
+          return new Container(
+            child: _renderServices(currentState.bspServices.servicesByCountry),
+          );
         }
         return Container();
       },
@@ -111,7 +86,7 @@ class BspServiceScreenState extends State<BspServiceScreen> {
               finalList.add(data);
             });
           } else {
-            data.services.forEach((ServiceList.Service services) {
+            data.services.forEach((Service services) {
               if (services.name
                   .toLowerCase()
                   .contains(widget.searchQuery.toLowerCase())) {
@@ -149,45 +124,11 @@ class BspServiceScreenState extends State<BspServiceScreen> {
                   widget.selection[itemsList[i].name] = val;
                   if (val) {
                     widget.servicesIds.add(itemsList[i].id);
-
-                    List<BspServices.Service> services =
-                        widget.selectedServices.where((service) {
-                      return service.mainCategory == item.name;
-                    }).toList();
-
-                    SubCategory subService = new SubCategory(
-                      id: itemsList[i].id,
-                      name: itemsList[i].name,
-                    );
-
-                    List<SubCategory> subCategories = [];
-                    if (services.length == 0) {
-                      subCategories.add(subService);
-                      widget.selectedServices.add(
-                        new BspServices.Service(
-                          mainCategory: item.name,
-                          mainCategoryId: item.id,
-                          subCategory: subCategories,
-                        ),
-                      );
-                    } else {
-                      print('services in else');
-                      print(services[0].subCategory);
-                      subCategories = services[0].subCategory;
-                      subCategories.add(subService);
-                    }
+                    print('widget.servicesIds');
+                    print(widget.servicesIds);
                   } else {
                     widget.servicesIds.removeWhere((service) {
                       return service == itemsList[i].id;
-                    });
-
-                    List<BspServices.Service> services =
-                        widget.selectedServices.where((service) {
-                      return service.mainCategory == item.name;
-                    }).toList();
-
-                    services[0].subCategory.removeWhere((subService) {
-                      return subService.id == itemsList[i].id;
                     });
                   }
                 });
@@ -199,5 +140,41 @@ class BspServiceScreenState extends State<BspServiceScreen> {
         );
       },
     );
+  }
+
+  List<TextSpan> _getSpans(String text, String matchWord, TextStyle style) {
+    List<TextSpan> spans = [];
+    int spanBoundary = 0;
+    if (matchWord == '') {
+      spans.add(TextSpan(text: text));
+      return spans;
+    }
+    do {
+      // look for the next match
+      final startIndex = text.indexOf(matchWord, spanBoundary);
+
+      // if no more matches then add the rest of the string without style
+      if (startIndex == -1) {
+        spans.add(TextSpan(text: text.substring(spanBoundary)));
+        return spans;
+      }
+
+      // add any unstyled text before the next match
+      if (startIndex > spanBoundary) {
+        spans.add(TextSpan(text: text.substring(spanBoundary, startIndex)));
+      }
+
+      // style the matched text
+      final endIndex = startIndex + matchWord.length;
+      final spanText = text.substring(startIndex, endIndex);
+      spans.add(TextSpan(text: spanText, style: style));
+
+      // mark the boundary to start the next search from
+      spanBoundary = endIndex;
+
+      // continue until there are no more matches
+    } while (spanBoundary < text.length);
+
+    return spans;
   }
 }

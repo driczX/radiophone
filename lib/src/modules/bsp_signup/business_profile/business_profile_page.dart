@@ -217,7 +217,7 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                 BspSignupCommonModel model = widget.bspSignupCommonModel;
                 model.profileComment = _comment.text;
                 model.businessProfilePictures = _bspProfileImages;
-                print('bspModel stored!');
+                print('bspModel ready to ship!');
                 Navigator.push(
                     context,
                     MaterialPageRoute(

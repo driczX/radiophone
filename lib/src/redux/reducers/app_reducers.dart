@@ -11,7 +11,7 @@ AppState appReducer(AppState state, action) {
   // } else {
   return new AppState(
     auth: authReducer(state.auth, action),
-    
+    signup: signupReducer(state.signup, action),
   );
   // }
 }

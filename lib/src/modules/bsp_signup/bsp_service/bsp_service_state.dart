@@ -1,6 +1,7 @@
+
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_service/index.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_model.dart';
 
 @immutable
 abstract class BspServiceState extends Equatable {
@@ -42,7 +43,7 @@ class ErrorBspServiceState extends BspServiceState {
   final String errorMessage;
 
   ErrorBspServiceState(this.errorMessage);
-  
+
   @override
   String toString() => 'ErrorBspServiceState';
 

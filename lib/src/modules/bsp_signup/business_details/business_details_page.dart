@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:graphql/utilities.dart' show multipartFileFrom;
+import 'package:http/http.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:tudo/src/modules/bsp_dashboard/bsp_main_screen.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_licensed_signup/bsp_licensed_signup_page.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_licensed_signup_terms/bsp_licensed_signup_terms_page.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
@@ -131,10 +135,12 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
                       ),
                       onPressed: () async {
                         if (isRedirect) {
-                          SharedPreferences pref =
-                              await SharedPreferences.getInstance();
-                          pref.remove('bspModel');
-                        
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BspMainScreen(),
+                            ),
+                          );
                           // NavigationHelper.navigatetoMainscreen(context);
                         } else {
                           NavigationHelper.navigatetoBack(context);
@@ -285,9 +291,14 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
                       tooltip: 'Edit Business details:',
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BspSignupPage()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BspSignupPage(),
+                            settings: RouteSettings(
+                              arguments: widget.bspSignupCommonModel,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -354,12 +365,16 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
                       tooltip: 'Edit Business License Details:',
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BspLicensedSignupPage(
-                                      bspSignupCommonModel:
-                                          widget.bspSignupCommonModel,
-                                    )));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BspLicensedSignupPage(
+                              bspSignupCommonModel: widget.bspSignupCommonModel,
+                            ),
+                            settings: RouteSettings(
+                              arguments: widget.bspSignupCommonModel,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -379,6 +394,79 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
             title: Text("Business License expiry Date"),
             subtitle: Text(
               '${widget.bspSignupCommonModel.licensed[0].bspExpiryDate}',
+            ),
+            leading: Icon(Icons.phone),
+          ),
+          ListTile(
+            title: Text("License issuing authority"),
+            subtitle: Text(
+              '${widget.bspSignupCommonModel.licensed[0].bspAuthority}',
+            ),
+            leading: Icon(Icons.date_range),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text("Uploaded Business Profile Pictures"),
+          SizedBox(
+            height: 5,
+          ),
+          _buildbusinessLicenseimages(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBusinessUnLicenseDeails(BusinessDetailsViewModel bdVm) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      child: Column(
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 5, 20, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "Business Unlicense Details:",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      tooltip: 'Edit Business Unlicense Details:',
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BspLicensedSignupPage(
+                                      bspSignupCommonModel:
+                                          widget.bspSignupCommonModel,
+                                    )));
+                      },
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          Divider(),
+          ListTile(
+            title: Text("Business Unlicense"),
+            subtitle: Text(
+              '${widget.bspSignupCommonModel.licensed[0].bspLicenseNumber}',
+            ),
+            leading: Icon(Icons.business),
+          ),
+          ListTile(
+            title: Text("Business UnLicense expiry Date"),
+            subtitle: Text(
+              '${widget.bspSignupCommonModel.unlicensed[0].bspExpiryDate}',
             ),
             leading: Icon(Icons.phone),
           ),
@@ -610,11 +698,40 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
     setState(() {
       _isLoading = true;
     });
-    List<File> profileImages = [];
-    widget.bspSignupCommonModel.businessProfilePictures
-        .map((BusinessProfilePicture profilePicture) {
-      profileImages.add(profilePicture.imageFile);
-    });
+    List<MultipartFile> profileImages = [];
+    // List<File> profileImages = [];
+    List<BusinessProfilePicture> bspPictures =
+        widget.bspSignupCommonModel.businessProfilePictures;
+
+    for (int i = 0; i < bspPictures.length; i++) {
+      var byteData = bspPictures[i].imageFile.readAsBytesSync();
+      var multipartFile = MultipartFile.fromBytes(
+        'photo',
+        byteData,
+        filename: '${DateTime.now().second}.jpg',
+        contentType: MediaType("image", "jpg"),
+      );
+      profileImages.add(multipartFile);
+      // profileImages.add(await multipartFileFrom(bspPictures[i].imageFile));
+      print('profileImages');
+      print(profileImages);
+    }
+    // widget.bspSignupCommonModel.businessProfilePictures
+    //     .map((BusinessProfilePicture profilePicture) {
+    //   var byteData = profilePicture.imageFile.readAsBytesSync();
+
+    //   var multipartFile = MultipartFile.fromBytes(
+    //     'photo',
+    //     byteData,
+    //     filename: '${DateTime.now().second}.jpg',
+    //     contentType: MediaType("image", "jpg"),
+    //   );
+    //   profileImages.add(multipartFile);
+    //   print('profileImages');
+    //   print(profileImages);
+    //   // profileImages.add(profilePicture.imageFile);
+    // });
+
     Map<String, dynamic> bspUserSignUpMap = {
       "userId": int.parse(bdVm.user.user.id),
       "name": widget.bspSignupCommonModel.businessLegalName,
@@ -624,12 +741,13 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
         "providesOnDemand": widget.bspSignupCommonModel.isOnDemand,
         "providesWalkin": widget.bspSignupCommonModel.isWalkin
       },
-      // "profilePictures": profileImages,
+      "profilePictures": profileImages,
       "employeesCount":
           int.parse(widget.bspSignupCommonModel.numberofEmployees),
       "agreeToPayForVerification": true,
       "termsAndConditions": [1, 2, 3]
     };
+    print('bspUserSignUpMap = $bspUserSignUpMap');
     BSPSignupRepository _bspSignupRepository = BSPSignupRepository();
     Map<String, dynamic> bspSignupResponse =
         await _bspSignupRepository.createMyBusiness(bspUserSignUpMap);
@@ -743,42 +861,84 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
     );
 
     return new Scaffold(
-      appBar: appbar,
-      bottomNavigationBar: bottomNavigationBar,
-      body: SingleChildScrollView(
-        child: Stack(
+        appBar: appbar,
+        bottomNavigationBar: bottomNavigationBar,
+        body: Stack(
           children: <Widget>[
-            Container(
-              margin: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-              child: Column(
-                children: <Widget>[
-                  _buildBusinessHeaders(bdVm),
-                  SizedBox(height: 20.0),
-                  _buildbusinessprofilepicture(),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  _buildBusinessOwnerDetails(bdVm),
-                  SizedBox(height: 20.0),
-                  _buildBusinessDetails(bdVm),
-                  SizedBox(height: 20.0),
-                  _buildBusinessLicenseDeails(bdVm),
-                  SizedBox(height: 20.0),
-                  _buildBusinessServiceDetails(),
-                  SizedBox(height: 20.0),
-                  _buildBusinessService(),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  _buildSelectedConsents(),
-                ],
+            SingleChildScrollView(
+              dragStartBehavior: DragStartBehavior.down,
+              child: new Container(
+                child: Column(
+                  children: <Widget>[
+                    _buildBusinessHeaders(bdVm),
+                    SizedBox(height: 20.0),
+                    _buildbusinessprofilepicture(),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    _buildBusinessOwnerDetails(bdVm),
+                    SizedBox(height: 20.0),
+                    _buildBusinessDetails(bdVm),
+                    SizedBox(height: 20.0),
+                    // widget.bspSignupCommonModel.isLicensed
+                    // ? _buildBusinessLicenseDeails(bdVm)
+                    // // : _buildBusinessUnLicenseDeails(bdVm),
+
+                    _buildBusinessLicenseDeails(bdVm),
+                    SizedBox(height: 20.0),
+                    _buildBusinessServiceDetails(),
+                    SizedBox(height: 20.0),
+                    _buildBusinessService(),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    _buildSelectedConsents(),
+                  ],
+                ),
               ),
             ),
             _isLoading ? FullScreenLoader() : SizedBox(),
           ],
-        ),
-      ),
-    );
+        )
+
+        //  SingleChildScrollView(
+        //   child: Stack(
+        //     children: <Widget>[
+        //       Container(
+        //         margin: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+        //         child: Column(
+        //           children: <Widget>[
+        //             _buildBusinessHeaders(bdVm),
+        //             SizedBox(height: 20.0),
+        //             _buildbusinessprofilepicture(),
+        //             SizedBox(
+        //               height: 20.0,
+        //             ),
+        //             _buildBusinessOwnerDetails(bdVm),
+        //             SizedBox(height: 20.0),
+        //             _buildBusinessDetails(bdVm),
+        //             SizedBox(height: 20.0),
+        //             // widget.bspSignupCommonModel.isLicensed
+        //             // ? _buildBusinessLicenseDeails(bdVm)
+        //             // // : _buildBusinessUnLicenseDeails(bdVm),
+
+        //             _buildBusinessLicenseDeails(bdVm),
+        //             SizedBox(height: 20.0),
+        //             _buildBusinessServiceDetails(),
+        //             SizedBox(height: 20.0),
+        //             _buildBusinessService(),
+        //             SizedBox(
+        //               height: 20.0,
+        //             ),
+        //             _buildSelectedConsents(),
+        //           ],
+        //         ),
+        //       ),
+        //       _isLoading ? FullScreenLoader() : SizedBox(),
+        //     ],
+        //   ),
+        // ),
+        );
   }
 
   @override

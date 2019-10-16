@@ -64,6 +64,7 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
   TimeOfDay time;
   String _countryId;
   BSPSignupRepository _bspSignupRepository = new BSPSignupRepository();
+  bool autovalidate = false;
 
   @override
   void initState() {
@@ -92,6 +93,23 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
           _bspLicenseAuthorityTypes =
               listOfLicenseAuthority['data']['licenceIssuingAuthorities'];
         });
+        print('model');
+        print(widget.bspSignupCommonModel.licensed);
+        if (widget.bspSignupCommonModel.licensed != null) {
+          _bspLicenseImages =
+              widget.bspSignupCommonModel.licensed[0].bspLicenseImages;
+          print(_bspLicenseImages);
+          _bspBusinessLicenseNumber.text =
+              widget.bspSignupCommonModel.licensed[0].bspLicenseNumber;
+          _bspLicenseAuthorityName.text =
+              widget.bspSignupCommonModel.licensed[0].bspAuthority;
+          _bspLicenseExpiryDate = DateTime.parse(
+              widget.bspSignupCommonModel.licensed[0].bspExpiryDate);
+          _bspLicenseAuthorityType =
+              widget.bspSignupCommonModel.bspLicenseAuthorityType;
+        } else {
+          print('I am in new mode');
+        }
       }
     });
   }
@@ -135,7 +153,7 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
 
   Widget _buildlicenseissuingauthority() {
     return FormBuilder(
-      autovalidate: true,
+      autovalidate: autovalidate,
       child: FormBuilderCustomField(
           attribute: "Issuing Authority",
           validators: [
@@ -205,34 +223,68 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
       children: List.generate(images.length, (index) {
         if (images[index] is ImageUploadModel) {
           ImageUploadModel uploadModel = images[index];
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: <Widget>[
-                Image.file(
-                  uploadModel.imageFile,
-                  width: 300,
-                  height: 300,
-                ),
-                Positioned(
-                  right: 5,
-                  top: 5,
-                  child: InkWell(
-                    child: Icon(
-                      Icons.remove_circle,
-                      size: 20,
-                      color: Colors.red,
-                    ),
-                    onTap: () {
-                      setState(() {
-                        images.replaceRange(index, index + 1, ['Add Image']);
-                      });
-                    },
+          if (widget.bspSignupCommonModel.licensed != null) {
+            return Card(
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: <Widget>[
+                  Image.file(
+                    widget.bspSignupCommonModel.licensed[0]
+                        .bspLicenseImages[index].imageFile,
+                    width: 100,
+                    height: 100,
                   ),
-                ),
-              ],
-            ),
-          );
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: InkWell(
+                      child: Icon(
+                        Icons.remove_circle,
+                        size: 20,
+                        color: Colors.red,
+                      ),
+                      onTap: () {
+                        setState(() {
+                          widget
+                              .bspSignupCommonModel.licensed[0].bspLicenseImages
+                              .removeRange(index, index + 1);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Card(
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: <Widget>[
+                  Image.file(
+                    uploadModel.imageFile,
+                    width: 300,
+                    height: 300,
+                  ),
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: InkWell(
+                      child: Icon(
+                        Icons.remove_circle,
+                        size: 20,
+                        color: Colors.red,
+                      ),
+                      onTap: () {
+                        setState(() {
+                          images.replaceRange(index, index + 1, ['Add Image']);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
         } else {
           return Card(
             child: IconButton(
@@ -322,6 +374,9 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
               borderRadius: BorderRadius.circular(7),
             ),
             onPressed: () async {
+              setState(() {
+                autovalidate = !autovalidate;
+              });
               if (_formKey.currentState.validate()) {
                 BspSignupCommonModel model = widget.bspSignupCommonModel;
                 print(model.licensed);
@@ -340,6 +395,7 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
                 licensed.bspAuthority = _bspLicenseAuthorityName.text;
                 listOfLicenses.add(licensed);
                 model.licensed = listOfLicenses;
+                model.bspLicenseAuthorityType = _bspLicenseAuthorityType;
                 print('after adding the license: model:');
                 print(model.toJson());
                 Navigator.push(
@@ -369,7 +425,7 @@ class _BspLicensedSignupPageState extends State<BspLicensedSignupPage>
                 top: false,
                 bottom: false,
                 child: Form(
-                  autovalidate: true,
+                  autovalidate: autovalidate,
                   key: _formKey,
                   child: Scrollbar(
                     child: SingleChildScrollView(

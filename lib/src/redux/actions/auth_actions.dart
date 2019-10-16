@@ -28,7 +28,7 @@ final Function login = (BuildContext context, LoginUser loginUser) {
     store.dispatch(
       new UserLoginSuccess(loginUser, loginUser.token, false),
     );
-    // NavigationHelper.navigatetoMainscreen(context);
+    NavigationHelper.navigatetoMainscreen(context);
   };
 };
 

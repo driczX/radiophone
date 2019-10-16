@@ -167,7 +167,7 @@ class _BspLicensedSignupTermsPageState
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(7),
             ),
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState.validate()) {
                 if (_isHome == false &&
                     _isOnDemand == false &&
@@ -187,13 +187,26 @@ class _BspLicensedSignupTermsPageState
                   model.isHome = _isHome;
                   model.isOnDemand = _isOnDemand;
                   print(model.toJson());
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
+                  final Route route = MaterialPageRoute(
                       builder: (context) =>
-                          BspServicePage(bspSignupCommonModel: model),
-                    ),
-                  );
+                          BspServicePage(bspSignupCommonModel: model));
+                  final result = await Navigator.push(context, route);
+                  try {
+                    if (result != null) {
+                      if (result) {
+                        //Return callback here.
+                      }
+                    }
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) =>
+                  //         BspServicePage(bspSignupCommonModel: model),
+                  //   ),
+                  // );
                 }
               }
             },

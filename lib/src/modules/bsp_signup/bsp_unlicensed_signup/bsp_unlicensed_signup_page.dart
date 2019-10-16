@@ -93,20 +93,33 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   String type = 'Passport';
   Map<String, String> _formdata = {};
   var _myWidgets = List<Widget>();
-  int _index = 1;
+  int _index = 3;
+  final Map<int, String> identification1Values = Map();
+  final Map<int, String> documentValues = Map();
+  final Map<int, DateTime> expiryDateValues = Map();
+  final Map<int, String> issuingAuthority = Map();
+  final Map<int, String> identificationPicturesValues = Map();
+  final List<TextEditingController> _controllers = List();
 
+  final List<TextEditingController> _documentControllers = List();
+  final List<TextEditingController> _issuingauthoritytype = List();
+  final List<TextEditingController> _expiryDate = List();
+  final List<TextEditingController> _issuingauthority = List();
+  final List<TextEditingController> _identificationpictures = List();
   void _add() {
+    TextEditingController controller = TextEditingController();
+    _controllers.add(controller);
     int keyValue = _index;
     _myWidgets = List.from(_myWidgets)
       ..add(Column(
         key: Key("${keyValue}"),
         children: <Widget>[
-          _buildidentificationtype1(),
-          _builddocumentnumber1(),
-          _buildexpirydate1(),
-          _buildissuingauthority1(),
-          _buildidentificationpictures(),
-          _buildinformationislegitmate(),
+          _buildidentificationtype1(keyValue, controller),
+          _builddocumentnumber1(keyValue, controller),
+          _buildexpirydate1(keyValue, controller),
+          _buildissuingauthority1(keyValue, controller),
+          _buildidentificationpictures(keyValue, controller),
+          _buildinformationislegitmate(keyValue),
         ],
       ));
 
@@ -121,7 +134,16 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     });
   }
 
-  Widget _buildidentificationtype1() {
+  Widget _buildidentificationtype1(
+      int keyValue, TextEditingController controller) {
+    TextEditingController controller = TextEditingController();
+    _issuingauthoritytype.add(controller);
+    print("------------------Reports--------------------");
+    print(_documentControllers);
+    print(_expiryDate);
+    print(_issuingauthority);
+    print(_issuingauthoritytype);
+    print("------------------Reports--------------------");
     return FormBuilder(
       autovalidate: true,
       child: FormBuilderCustomField(
@@ -145,7 +167,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     isDense: true,
                     onChanged: (String newValue) {
                       setState(() {
-                        type = newValue;
+                        type = identification1Values[keyValue] = newValue;
                         field.didChange(newValue);
                       });
                     },
@@ -165,9 +187,11 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     );
   }
 
-  Widget _builddocumentnumber1() {
+  Widget _builddocumentnumber1(int keyValue, TextEditingController controller) {
+    TextEditingController controller = TextEditingController();
+    _documentControllers.add(controller);
     return new TudoTextWidget(
-      controller: clrbusinesslicense,
+      controller: controller,
       prefixIcon: Icon(FontAwesomeIcons.idCard),
       labelText: AppConstantsValue.appConst['unlicensedsignup']
           ['documentnumber1']['translation'],
@@ -175,26 +199,32 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
           ['documentnumber1']['translation'],
       validator: Validators().validateLicenseno,
       onSaved: (val) {
-        _licenseno = val;
+        setState(() {
+          documentValues[keyValue] = val;
+        });
+        // _licenseno = val;
       },
     );
   }
 
-  Widget _buildexpirydate1() {
+  Widget _buildexpirydate1(int keyValue, TextEditingController controller) {
+    TextEditingController controller = TextEditingController();
+    _expiryDate.add(controller);
     return FormField(builder: (FormFieldState state) {
       return DateTimeField(
         decoration: InputDecoration(
-            labelText: expirydate1.toString(),
+            labelText: expiryDateValues[keyValue].toString(),
             prefixIcon: Icon(Icons.date_range)),
         format: format,
         onShowPicker: (context, currentValue) async {
           final DateTime picked = await showDatePicker(
               context: context,
-              initialDate: expirydate1,
+              initialDate: expiryDateValues[keyValue] = expirydate1,
               firstDate: DateTime(1900),
               lastDate: DateTime.now());
           if (picked != null && picked != expirydate1)
             setState(() {
+              expiryDateValues[keyValue] = expirydate1;
               expirydate1 = picked;
               print(expirydate1);
             });
@@ -203,7 +233,10 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     });
   }
 
-  Widget _buildissuingauthority1() {
+  Widget _buildissuingauthority1(
+      int keyValue, TextEditingController controller) {
+    TextEditingController controller = TextEditingController();
+    _issuingauthority.add(controller);
     return new TudoTextWidget(
       prefixIcon: Icon(FontAwesomeIcons.idCard),
       labelText: AppConstantsValue.appConst['unlicensedsignup']
@@ -212,107 +245,19 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
           ['issuingauthority1']['translation'],
       validator: (val) => Validators.validateName(val, "Issuing Authority"),
       onSaved: (val) {
-        _illusingauthority = val;
+        setState(() {
+          issuingAuthority[keyValue] = val;
+        });
+        // _illusingauthority = issuingAuthority[keyValue] = val;
       },
-      controller: clrissuingauthority,
+      controller: controller,
     );
   }
 
-  Widget _buildidentificationtype2() {
-    return FormBuilder(
-      autovalidate: true,
-      child: FormBuilderCustomField(
-          attribute: "Identification type",
-          validators: [FormBuilderValidators.required()],
-          formField: FormField(
-            builder: (FormFieldState<dynamic> field) {
-              return InputDecorator(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.location_on),
-                  labelText: AppConstantsValue.appConst['unlicensedsignup']
-                      ['identificationtype2']['translation'],
-                  hintText: AppConstantsValue.appConst['unlicensedsignup']
-                      ['identificationtype2']['translation'],
-                  errorText: field.errorText,
-                ),
-                isEmpty: type2 == '',
-                child: new DropdownButtonHideUnderline(
-                  child: new DropdownButton(
-                    value: type2,
-                    isDense: true,
-                    onChanged: (String newValue) {
-                      setState(() {
-                        type2 = newValue;
-                        field.didChange(newValue);
-                      });
-                    },
-                    items: _type2.map(
-                      (String value) {
-                        return new DropdownMenuItem(
-                          value: value,
-                          child: new Text(value),
-                        );
-                      },
-                    ).toList(),
-                  ),
-                ),
-              );
-            },
-          )),
-    );
-  }
-
-  Widget _builddocumentnumber2() {
-    return new TudoTextWidget(
-      controller: clrbusinesslicense2,
-      prefixIcon: Icon(FontAwesomeIcons.idCard),
-      labelText: AppConstantsValue.appConst['unlicensedsignup']
-          ['documentnumber2']['translation'],
-      validator: Validators().validateLicenseno,
-      onSaved: (val) {
-        _licenseno2 = val;
-      },
-    );
-  }
-
-  Widget _buildexpirydate2() {
-    return FormField(builder: (FormFieldState state) {
-      return DateTimeField(
-        decoration: InputDecoration(
-            labelText: expirydate2.toString(),
-            prefixIcon: Icon(Icons.date_range)),
-        format: format2,
-        onShowPicker: (context, currentValue) async {
-          final DateTime picked = await showDatePicker(
-            context: context,
-            initialDate: expirydate2,
-            firstDate: DateTime(1900),
-            lastDate: DateTime.now(),
-          );
-          if (picked != null && picked != expirydate2)
-            setState(() {
-              expirydate2 = picked;
-              print(expirydate2);
-            });
-        },
-      );
-    });
-  }
-
-  Widget _buildissuingauthority2() {
-    return new TudoTextWidget(
-      controller: clrissuingauthority2,
-      prefixIcon: Icon(FontAwesomeIcons.idCard),
-      labelText: AppConstantsValue.appConst['unlicensedsignup']
-          ['issuingauthority2']['translation'],
-      validator: (val) => Validators.validateName(val, "Issuing authority"),
-      onSaved: (val) {
-        _illusingauthority2 = val;
-      },
-    );
-  }
-
-  Widget _buildidentificationpictures() {
+  Widget _buildidentificationpictures(
+      int keyValue, TextEditingController controller) {
+    TextEditingController controller = TextEditingController();
+    _identificationpictures.add(controller);
     return GridView.count(
       shrinkWrap: true,
       crossAxisCount: 5,
@@ -384,7 +329,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     });
   }
 
-  Widget _buildinformationislegitmate() {
+  Widget _buildinformationislegitmate(keyValue) {
     return TudoConditionWidget(
       text:
           "Above entered Identity information is legitimate and accurate to my knowledge",
@@ -449,44 +394,97 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
         height: double.infinity,
         width: double.infinity,
         child: Form(
-          autovalidate: true,
-          key: _formKey,
+            autovalidate: true,
+            key: _formKey,
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: SizedBox(
+                        child: ListView(
+                          padding: const EdgeInsets.all(30.0),
+                          children: _myWidgets,
+                        ),
+                      ),
+                    ),
 
-          child: ListView(
-            padding: const EdgeInsets.all(30.0),
-            children: _myWidgets,
-          ),
-          // child: Stack(
-          //   children: <Widget>[
-          //     // Background(),
-          //     SingleChildScrollView(
-          //       padding: const EdgeInsets.all(30.0),
-          //       child: new Container(
-          //         child: new Column(
-          //           mainAxisAlignment: MainAxisAlignment.start,
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             isClicked ? _buildidentificationtype1() : Container(),
-          //             isClicked ? _builddocumentnumber1() : Container(),
-          //             isClicked ? _buildexpirydate1() : Container(),
-          //             isClicked ? _buildissuingauthority1() : Container(),
-          //             // _buildidentificationtype1(),
-          //             // _builddocumentnumber1(),
-          //             // _buildexpirydate1(),
-          //             // _buildissuingauthority1(),
-          //             // _buildidentificationtype2(),
-          //             // _builddocumentnumber2(),
-          //             // _buildexpirydate2(),
-          //             // _buildissuingauthority2(),
-          //             _buildidentificationpictures(),
-          //             _buildinformationislegitmate(),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-        ),
+                    // Expanded(
+                    //   child: SizedBox(
+                    //     child: ListView(
+                    //       padding: const EdgeInsets.all(30.0),
+                    //       children: [
+                    //         _buildidentificationtype1(),
+                    //         _builddocumentnumber1(),
+                    //         _buildexpirydate1(),
+                    //         _buildissuingauthority1(),
+                    //         _buildidentificationtype2(),
+                    //         _builddocumentnumber2(),
+                    //         _buildexpirydate2(),
+                    //         _buildissuingauthority2(),
+                    //         _buildidentificationpictures(),
+                    //         _buildinformationislegitmate(),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    // SingleChildScrollView(
+                    //   padding: const EdgeInsets.all(30.0),
+                    //   child: new Container(
+                    //     child: new Column(
+                    //       mainAxisAlignment: MainAxisAlignment.start,
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         _buildidentificationtype1(),
+                    //         _builddocumentnumber1(),
+                    //         _buildexpirydate1(),
+                    //         _buildissuingauthority1(),
+                    //         _buildidentificationtype2(),
+                    //         _builddocumentnumber2(),
+                    //         _buildexpirydate2(),
+                    //         _buildissuingauthority2(),
+                    //         _buildidentificationpictures(),
+                    //         _buildinformationislegitmate(),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                )
+              ],
+            )
+
+            // child: Stack(
+            //   children: <Widget>[
+            //     // Background(),
+            //     SingleChildScrollView(
+            //       padding: const EdgeInsets.all(30.0),
+            //       child: new Container(
+            //         child: new Column(
+            //           mainAxisAlignment: MainAxisAlignment.start,
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             isClicked ? _buildidentificationtype1() : Container(),
+            //             isClicked ? _builddocumentnumber1() : Container(),
+            //             isClicked ? _buildexpirydate1() : Container(),
+            //             isClicked ? _buildissuingauthority1() : Container(),
+            //             // _buildidentificationtype1(),
+            //             // _builddocumentnumber1(),
+            //             // _buildexpirydate1(),
+            //             // _buildissuingauthority1(),
+            //             // _buildidentificationtype2(),
+            //             // _builddocumentnumber2(),
+            //             // _buildexpirydate2(),
+            //             // _buildissuingauthority2(),
+            //             _buildidentificationpictures(),
+            //             _buildinformationislegitmate(),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            ),
       ),
     );
   }

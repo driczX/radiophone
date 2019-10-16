@@ -1,18 +1,18 @@
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_model.dart';
+
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_service/index.dart';
 import 'package:tudo/src/utils/gql_strings.dart';
 import 'package:tudo/src/utils/graphql_helper.dart';
 
 class BspServiceRepository {
   BspServiceRepository();
 
-  Future<BspServices> getBspServices(
-      int countryId, bool isHome, bool isOnDemand, bool isWalkIn) async {
+  Future<BspServices> getBspServices() async {
     Map<String, dynamic> serviceRequestMap = {
       "serviceMeta": {
-        'countryId': countryId,
-        'onDemand': isHome,
-        'walkIn': isWalkIn,
+        'countryId': 1,
+        'onDemand': true,
+        'walkIn': true,
       }
     };
 

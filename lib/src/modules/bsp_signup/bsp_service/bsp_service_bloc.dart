@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:tudo/src/modules/bsp_signup/bsp_service/index.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_event.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_state.dart';
 
 class BspServiceBloc extends Bloc<BspServiceEvent, BspServiceState> {
   static final BspServiceBloc _bspServiceBlocSingleton =
