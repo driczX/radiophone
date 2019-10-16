@@ -33,11 +33,11 @@ class SplashScreenState extends State<SplashScreen>
       if (userString != null) {
         NavigationHelper.navigatetoMainscreen(context);
       } else {
-        NavigationHelper.navigatetoMainscreen(context);
+        NavigationHelper.navigatetologinscreen(context);
         // Navigator.push(context, MaterialPageRoute(builder: (context)=>AuthScreen()));
       }
     } else {
-      NavigationHelper.navigatetoMainscreen(context);
+      NavigationHelper.navigatetolanguagescreen(context);
     }
   }
 

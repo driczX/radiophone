@@ -4,6 +4,8 @@ import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_bloc.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_screen.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
 
+
+
 class BspServicePage extends StatefulWidget {
   static const String routeName = "/bspService";
   final BspSignupCommonModel bspSignupCommonModel;
