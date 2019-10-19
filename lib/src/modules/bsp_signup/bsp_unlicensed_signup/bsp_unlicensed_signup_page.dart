@@ -6,6 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:tudo/src/modules/bsp_signup/bsp_licensed_signup_terms/bsp_licensed_signup_terms_page.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
 import 'package:tudo/src/styles/colors.dart';
 import 'package:tudo/src/utils/app_constants_value.dart';
@@ -33,29 +34,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   List<Object> images = List<Object>();
   Future<File> _imageFile;
-
-  @override
-  void initState() {
-    super.initState();
-    debugPrint(
-        'BSP SIGNUP DATA: ${widget.bspSignupCommonModel.businessPhoneNumber}');
-    debugPrint('BSP SIGNUP DATA: ${widget.bspSignupCommonModel.businessYear}');
-    debugPrint(
-        'BSP SIGNUP DATA: ${widget.bspSignupCommonModel.numberofEmployees}');
-    debugPrint('BSP SIGNUP DATA: ${widget.bspSignupCommonModel.businessType}');
-    debugPrint(
-        'BSP SIGNUP DATA: ${widget.bspSignupCommonModel.businessLegalName}');
-    debugPrint(
-        'BSP SIGNUP DATA: ${widget.bspSignupCommonModel.businessLegalAddress}');
-    setState(() {
-      images.add("Add Image");
-      images.add("Add Image");
-      images.add("Add Image");
-      images.add("Add Image");
-      images.add("Add Image");
-    });
-  }
-
+  bool autovalidate = false;
   bool informationislegitimate = false;
   DateTime expirydate1 = DateTime.now();
   DateTime expirydate2 = DateTime.now();
@@ -63,24 +42,6 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   final format = DateFormat("yyyy-MM-dd");
   final format2 = DateFormat("yyyy-MM-dd");
 
-  /* final TextEditingController clrbusinesslicense = TextEditingController();
-  final TextEditingController clrbusinesslicense2 = TextEditingController();
-  final TextEditingController clrissuingauthority = TextEditingController();
-  final TextEditingController clrissuingauthority2 = TextEditingController();*/
-
-  /* String _licenseno;
-  String _licenseno2;
-  String _illusingauthority;
-  String _illusingauthority2;
-  List<String> _type2 = <String>[
-    '',
-    'Passport',
-    'Driving License',
-    'Voter ID card',
-    'Ration Card',
-    'Aadhar',
-    'Other Id',
-  ];*/
   String type2 = 'Passport';
   List<String> _type = <String>[
     '',
@@ -95,7 +56,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
 //  Map<String, String> _formdata = {};
   var _myWidgets = List<Widget>();
-  int _index = 3;
+  int _index = 0;
   final Map<int, String> identification1Values = Map();
   final Map<int, String> documentValues = Map();
   final Map<int, DateTime> expiryDateValues = Map();
@@ -108,6 +69,18 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   final List<TextEditingController> _issuingauthority = List();
   final List<List<Object>> _identificationpictures = List();
 
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      images.add("Add Image");
+      images.add("Add Image");
+      images.add("Add Image");
+      images.add("Add Image");
+      images.add("Add Image");
+    });
+  }
+
   void _add() {
 //    TextEditingController controller = TextEditingController();
     int keyValue = _index;
@@ -115,12 +88,54 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
       ..add(Column(
         key: Key("$keyValue"),
         children: <Widget>[
-          _buildidentificationtype1(keyValue),
-          _builddocumentnumber1(keyValue),
-          _buildexpirydate1(keyValue),
-          _buildissuingauthority1(keyValue),
-          _buildidentificationpictures(keyValue),
-          _buildinformationislegitmate(keyValue),
+          SizedBox(height: 10),
+          Container(
+            // padding: EdgeInsets.fromLTRB(18,5,18,18),
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 15,
+                ),
+              ],
+            ),
+            child: Column(
+              children: <Widget>[
+                Stack(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: GestureDetector(
+                        child: Icon(Icons.close),
+                        onTap: () {
+                          print("CLose pressed");
+                          _myWidgets = List.from(_myWidgets)..removeAt(_index);
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20,
+                        ),
+                        _buildidentificationtype1(keyValue),
+                        _builddocumentnumber1(keyValue),
+                        _builddate(keyValue),
+                        _buildissuingauthority1(keyValue),
+                        _buildidentificationpictures(keyValue),
+                      ],
+                    ),
+                  ],
+                )
+              ],
+            ),
+          )
         ],
       ));
 
@@ -139,14 +154,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   Widget _buildidentificationtype1(int keyValue) {
     TextEditingController controller = TextEditingController();
     _issuingauthoritytype.add(controller);
-    print("------------------Reports--------------------");
-    print(_documentControllers);
-    print(_expiryDate);
-    print(_issuingauthority);
-    print(_issuingauthoritytype);
-    print("------------------Reports--------------------");
+
     return FormBuilder(
-      autovalidate: true,
+      autovalidate: autovalidate,
       child: FormBuilderCustomField(
           attribute: "Business type",
           validators: [FormBuilderValidators.required()],
@@ -208,31 +218,31 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     );
   }
 
-  Widget _buildexpirydate1(int keyValue) {
+  Widget _builddate(int keyValue) {
     TextEditingController controller = TextEditingController();
     _expiryDate.add(controller);
-    return FormField(builder: (FormFieldState state) {
-      return DateTimeField(
-        decoration: InputDecoration(
-            labelText: expiryDateValues[keyValue].toString(),
-            prefixIcon: Icon(Icons.date_range)),
-        format: format,
-        onShowPicker: (context, currentValue) async {
-          final DateTime picked = await showDatePicker(
-              context: context,
-              initialDate: expiryDateValues[keyValue] = expirydate1,
-              firstDate: DateTime(1900),
-              lastDate: DateTime.now());
-          print(picked);
-          if (picked != null && picked != expirydate1)
-            setState(() {
-              expirydate1 = picked;
-              controller.text = expirydate1.toIso8601String();
-              print(expirydate1);
-            });
-        },
-      );
-    });
+    return DateTimeField(
+      format: format,
+      autocorrect: true,
+      autovalidate: autovalidate,
+      controller: controller,
+      readOnly: true,
+      // validator: (date) => date == null ? 'Please enter valid date' : null,
+      decoration: InputDecoration(
+          labelText: "Expiry Date",
+          hintText: "Expiry Date",
+          prefixIcon: Icon(
+            FontAwesomeIcons.calendar,
+            size: 24,
+          )),
+      onShowPicker: (context, currentValue) {
+        return showDatePicker(
+            context: context,
+            firstDate: DateTime.now(),
+            initialDate: currentValue ?? DateTime.now(),
+            lastDate: DateTime(2100));
+      },
+    );
   }
 
   Widget _buildissuingauthority1(int keyValue) {
@@ -257,20 +267,22 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _buildidentificationpictures(int keyValue) {
     return GridView.count(
+      physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       crossAxisCount: 5,
       childAspectRatio: 1,
       children: List.generate(images.length, (index) {
         if (images[index] is ImageUploadModel) {
           ImageUploadModel uploadModel = images[index];
+
           return Card(
             clipBehavior: Clip.antiAlias,
             child: Stack(
               children: <Widget>[
                 Image.file(
                   uploadModel.imageFile,
-                  width: 100,
-                  height: 100,
+                  width: 300,
+                  height: 300,
                 ),
                 Positioned(
                   right: 5,
@@ -328,7 +340,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     });
   }
 
-  Widget _buildinformationislegitmate(keyValue) {
+  Widget _buildinformationislegitmate() {
     return TudoConditionWidget(
       text:
           "Above entered Identity information is legitimate and accurate to my knowledge",
@@ -338,7 +350,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text("BSP Unlicensed Signup"),
+      title: Text("BSP Unlicensed Details"),
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios),
         onPressed: () {
@@ -359,7 +371,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
           new FlatButton.icon(
             icon: Icon(Icons.close),
             label: Text('Clear'),
+            color: Colors.redAccent,
             textColor: Colors.black,
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(7),
             ),
@@ -369,29 +383,50 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
               icon: Icon(FontAwesomeIcons.arrowCircleRight),
               label: Text('Next'),
               color: colorStyles["primary"],
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(7),
               ),
               onPressed: () async {
+                setState(() {
+                  autovalidate = !autovalidate;
+                });
                 if (_formKey.currentState.validate()) {
+                  List<Licensed> listOfLicenses = new List<Licensed>();
                   BspSignupCommonModel model = widget.bspSignupCommonModel;
                   for (var i = 0; i < _myWidgets.length; i++) {
                     String document = _documentControllers[i].text;
                     String issuingAuthorityType = _issuingauthoritytype[i].text;
                     String expiryDate = _expiryDate[i].text;
                     String issuingAuthority = _issuingauthority[i].text;
-//                    String picture = _identificationpictures[i].text;
-                    print(
-                        'Document: $document\nIssuingAuthorityType: $issuingAuthorityType'
-                        '\nExpiryDate: $expiryDate\nIssuingAuthority: $issuingAuthority'
-                        '\nPicture: ${_identificationpictures.length}');
+                    //  String picture = _identificationpictures[i].text;
+                    print('Document: $document');
+                    print('IssuingAuthorityType: $issuingAuthorityType');
+                    print('ExpiryDate: $expiryDate');
+                    print('IssuingAuthority: $issuingAuthority');
+                    print('Picture: ${_identificationpictures.length}');
+                    print(_myWidgets.length);
+                    Licensed licensed = new Licensed(
+                      bspLicenseNumber: document,
+                      bspAuthority: issuingAuthority,
+                      bspExpiryDate: expiryDate,
+                      bspIssuing: issuingAuthorityType,
+                    );
+                    licensed.bspLicenseNumber = _documentControllers[i].text;
+                    licensed.bspExpiryDate = _expiryDate[i].text;
+                    licensed.bspIssuing = _issuingauthoritytype[i].text;
+                    licensed.bspAuthority = _issuingauthority[i].text;
+                    listOfLicenses.add(licensed);
                   }
-                  /* Navigator.push(
+                  model.unlicensed = listOfLicenses;
+                  print(model.toJson());
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => BspLicensedSignupTermsPage(
-                              bspSignupCommonModel: model)));*/
+                        builder: (context) => BspLicensedSignupTermsPage(
+                            bspSignupCommonModel: model),
+                      ));
                 }
               }),
         ],
@@ -400,11 +435,25 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
     return new Scaffold(
       appBar: appBar,
       bottomNavigationBar: bottomNavigationBar,
+      floatingActionButton: new FloatingActionButton.extended(
+        onPressed: () {
+          _add();
+        },
+        label: Text(
+          "Add License",
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+        icon: Icon(
+          Icons.add,
+          size: 28,
+          color: Colors.white,
+        ),
+      ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
         child: Form(
-            autovalidate: true,
+            autovalidate: autovalidate,
             key: _formKey,
             child: Stack(
               children: <Widget>[
@@ -413,88 +462,16 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     Expanded(
                       child: SizedBox(
                         child: ListView(
-                          padding: const EdgeInsets.all(30.0),
+                          padding: const EdgeInsets.all(18.0),
                           children: _myWidgets,
                         ),
                       ),
                     ),
-
-                    // Expanded(
-                    //   child: SizedBox(
-                    //     child: ListView(
-                    //       padding: const EdgeInsets.all(30.0),
-                    //       children: [
-                    //         _buildidentificationtype1(),
-                    //         _builddocumentnumber1(),
-                    //         _buildexpirydate1(),
-                    //         _buildissuingauthority1(),
-                    //         _buildidentificationtype2(),
-                    //         _builddocumentnumber2(),
-                    //         _buildexpirydate2(),
-                    //         _buildissuingauthority2(),
-                    //         _buildidentificationpictures(),
-                    //         _buildinformationislegitmate(),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                    // SingleChildScrollView(
-                    //   padding: const EdgeInsets.all(30.0),
-                    //   child: new Container(
-                    //     child: new Column(
-                    //       mainAxisAlignment: MainAxisAlignment.start,
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         _buildidentificationtype1(),
-                    //         _builddocumentnumber1(),
-                    //         _buildexpirydate1(),
-                    //         _buildissuingauthority1(),
-                    //         _buildidentificationtype2(),
-                    //         _builddocumentnumber2(),
-                    //         _buildexpirydate2(),
-                    //         _buildissuingauthority2(),
-                    //         _buildidentificationpictures(),
-                    //         _buildinformationislegitmate(),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
+                    _buildinformationislegitmate(),
                   ],
                 )
               ],
-            )
-
-            // child: Stack(
-            //   children: <Widget>[
-            //     // Background(),
-            //     SingleChildScrollView(
-            //       padding: const EdgeInsets.all(30.0),
-            //       child: new Container(
-            //         child: new Column(
-            //           mainAxisAlignment: MainAxisAlignment.start,
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //             isClicked ? _buildidentificationtype1() : Container(),
-            //             isClicked ? _builddocumentnumber1() : Container(),
-            //             isClicked ? _buildexpirydate1() : Container(),
-            //             isClicked ? _buildissuingauthority1() : Container(),
-            //             // _buildidentificationtype1(),
-            //             // _builddocumentnumber1(),
-            //             // _buildexpirydate1(),
-            //             // _buildissuingauthority1(),
-            //             // _buildidentificationtype2(),
-            //             // _builddocumentnumber2(),
-            //             // _buildexpirydate2(),
-            //             // _buildissuingauthority2(),
-            //             _buildidentificationpictures(),
-            //             _buildinformationislegitmate(),
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            ),
+            )),
       ),
     );
   }
