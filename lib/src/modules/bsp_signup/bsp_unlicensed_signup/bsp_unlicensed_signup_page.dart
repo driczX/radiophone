@@ -36,10 +36,11 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   Future<File> _imageFile;
   bool autovalidate = false;
   bool informationislegitimate = false;
+  bool _isvisibleissuingauthority = false;
   DateTime expirydate1 = DateTime.now();
   DateTime expirydate2 = DateTime.now();
 
-  final format = DateFormat("yyyy-MM-dd");
+  final format = DateFormat.yMMMEd('en-US');
   final format2 = DateFormat("yyyy-MM-dd");
 
   String type2 = 'Passport';
@@ -56,7 +57,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
 //  Map<String, String> _formdata = {};
   var _myWidgets = List<Widget>();
-  int _index = 0;
+  int _index = 1;
   final Map<int, String> identification1Values = Map();
   final Map<int, String> documentValues = Map();
   final Map<int, DateTime> expiryDateValues = Map();
@@ -68,6 +69,12 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   final List<TextEditingController> _expiryDate = List();
   final List<TextEditingController> _issuingauthority = List();
   final List<List<Object>> _identificationpictures = List();
+  Map<int, Widget> _myWidgetsMap = Map();
+  Map<int, TextEditingController> _documentControllersMap = Map();
+  Map<int, TextEditingController> _issuingauthoritytypeMap = Map();
+  Map<int, TextEditingController> _expiryDateMap = Map();
+  Map<int, TextEditingController> _issuingauthorityMap = Map();
+  Map<int, List<Object>> _identificationpicturesMap = Map();
 
   @override
   void initState() {
@@ -82,15 +89,14 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   }
 
   void _add() {
-//    TextEditingController controller = TextEditingController();
-    int keyValue = _index;
-    _myWidgets = List.from(_myWidgets)
-      ..add(Column(
+// TextEditingController controller = TextEditingController();
+    setState(() {
+      int keyValue = _myWidgetsMap.values.length;
+      _myWidgetsMap[keyValue] = (Column(
         key: Key("$keyValue"),
         children: <Widget>[
           SizedBox(height: 10),
           Container(
-            // padding: EdgeInsets.fromLTRB(18,5,18,18),
             padding: EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -112,7 +118,10 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                         child: Icon(Icons.close),
                         onTap: () {
                           print("CLose pressed");
-                          _myWidgets = List.from(_myWidgets)..removeAt(_index);
+                          setState(() {
+                            _myWidgetsMap = Map.from(_myWidgetsMap)
+                              ..remove(keyValue);
+                          });
                         },
                       ),
                     ),
@@ -127,7 +136,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                         _buildidentificationtype1(keyValue),
                         _builddocumentnumber1(keyValue),
                         _builddate(keyValue),
-                        _buildissuingauthority1(keyValue),
+                        _isvisibleissuingauthority
+                            ? _buildissuingauthority1(keyValue)
+                            : SizedBox(),
                         _buildidentificationpictures(keyValue),
                       ],
                     ),
@@ -138,7 +149,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
           )
         ],
       ));
-
+    });
     setState(() => ++_index);
   }
 
@@ -153,7 +164,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _buildidentificationtype1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    _issuingauthoritytype.add(controller);
+    // _issuingauthoritytype.add(controller);
+
+    _issuingauthoritytypeMap[keyValue] = controller;
 
     return FormBuilder(
       autovalidate: autovalidate,
@@ -178,6 +191,13 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     isDense: true,
                     onChanged: (String newValue) {
                       setState(() {
+                        if (newValue
+                            .toLowerCase()
+                            .contains("other".toLowerCase())) {
+                          _isvisibleissuingauthority = true;
+                        } else {
+                          _isvisibleissuingauthority = false;
+                        }
                         type = controller.text = newValue;
                         field.didChange(newValue);
                       });
@@ -200,7 +220,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _builddocumentnumber1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    _documentControllers.add(controller);
+    // _documentControllers.add(controller);
+
+    _documentControllersMap[keyValue] = controller;
     return new TudoTextWidget(
       controller: controller,
       prefixIcon: Icon(FontAwesomeIcons.idCard),
@@ -220,7 +242,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _builddate(int keyValue) {
     TextEditingController controller = TextEditingController();
-    _expiryDate.add(controller);
+    // _expiryDate.add(controller);
+
+    _expiryDateMap[keyValue] = controller;
     return DateTimeField(
       format: format,
       autocorrect: true,
@@ -247,7 +271,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _buildissuingauthority1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    _issuingauthority.add(controller);
+    // _issuingauthority.add(controller);
+
+    _issuingauthorityMap[keyValue] = controller;
     return new TudoTextWidget(
       prefixIcon: Icon(FontAwesomeIcons.idCard),
       labelText: AppConstantsValue.appConst['unlicensedsignup']
@@ -296,7 +322,9 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     onTap: () {
                       setState(() {
                         images.replaceRange(index, index + 1, ['Add Image']);
-                        _identificationpictures.add(images);
+                        // _identificationpictures.add(images);
+
+                        _identificationpicturesMap[keyValue] = images;
                       });
                     },
                   ),
@@ -343,7 +371,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   Widget _buildinformationislegitmate() {
     return TudoConditionWidget(
       text:
-          "Above entered Identity information is legitimate and accurate to my knowledge",
+          "Above entered Identity information is legitimate and accurate toList() my knowledge",
     );
   }
 
@@ -357,7 +385,16 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
           NavigationHelper.navigatetoBack(context);
         },
       ),
-      actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: _add)],
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            setState(() {
+              _add();
+            });
+          },
+        ),
+      ],
       centerTitle: true,
     );
     final bottomNavigationBar = Container(
@@ -395,7 +432,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                 if (_formKey.currentState.validate()) {
                   List<Licensed> listOfLicenses = new List<Licensed>();
                   BspSignupCommonModel model = widget.bspSignupCommonModel;
-                  for (var i = 0; i < _myWidgets.length; i++) {
+                  for (var i = 0; i < _myWidgetsMap.length; i++) {
                     String document = _documentControllers[i].text;
                     String issuingAuthorityType = _issuingauthoritytype[i].text;
                     String expiryDate = _expiryDate[i].text;
@@ -406,7 +443,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     print('ExpiryDate: $expiryDate');
                     print('IssuingAuthority: $issuingAuthority');
                     print('Picture: ${_identificationpictures.length}');
-                    print(_myWidgets.length);
+                    print(_myWidgetsMap.length);
                     Licensed licensed = new Licensed(
                       bspLicenseNumber: document,
                       bspAuthority: issuingAuthority,
@@ -463,7 +500,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                       child: SizedBox(
                         child: ListView(
                           padding: const EdgeInsets.all(18.0),
-                          children: _myWidgets,
+                          children: _myWidgetsMap.values,
                         ),
                       ),
                     ),
