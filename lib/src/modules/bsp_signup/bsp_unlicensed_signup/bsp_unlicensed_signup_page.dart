@@ -91,7 +91,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   void _add() {
 // TextEditingController controller = TextEditingController();
     setState(() {
-      int keyValue = _myWidgetsMap.values.length;
+      int keyValue = ++_index;
       _myWidgetsMap[keyValue] = (Column(
         key: Key("$keyValue"),
         children: <Widget>[
@@ -500,7 +500,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                       child: SizedBox(
                         child: ListView(
                           padding: const EdgeInsets.all(18.0),
-                          children: _myWidgetsMap.values,
+                          children: _myWidgetsMap.values.toList(),
                         ),
                       ),
                     ),
