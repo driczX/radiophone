@@ -26,6 +26,8 @@ class TudoConditionDialogWidget extends StatelessWidget {
       content: Container(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
               height: 10,

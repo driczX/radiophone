@@ -10,6 +10,7 @@ import 'package:redux/redux.dart';
 
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_repository.dart';
+import 'package:tudo/src/modules/bsp_signup/business_details/business_details_page.dart';
 import 'package:tudo/src/redux/models/app_state.dart';
 import 'package:tudo/src/redux/models/login_user.dart';
 
@@ -39,7 +40,7 @@ class _BspSignupPageState extends State<BspSignupPage>
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // final TextEditingController _bspPhone = TextEditingController();
   final MaskedTextController _bspPhone =
-      new MaskedTextController(mask: '(000)-000-0000');
+      new MaskedTextController(mask: '(000)-000-00000');
   final TextEditingController _bspBusinessName = TextEditingController();
   final TextEditingController _bspBusinessLegalAddress =
       TextEditingController();
@@ -70,6 +71,8 @@ class _BspSignupPageState extends State<BspSignupPage>
   TimeOfDay time;
   Map<String, dynamic> bspsignupdata = new Map<String, dynamic>();
   bool autovalidate = false;
+  int _countryId;
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -110,6 +113,8 @@ class _BspSignupPageState extends State<BspSignupPage>
     _bspNumberOfEmployee.text = model.numberofEmployees;
     _bspBusinessLegalAddress.text = model.businessLegalAddress;
     _typeValue = model.businessTypes;
+    _isEditMode = true;
+    print('isEditMode = $_isEditMode');
     // List setTypes = _type.where((bspTypeList) {
     //   return bspTypeList['id'] == model.businessType;
     // });
@@ -192,7 +197,7 @@ class _BspSignupPageState extends State<BspSignupPage>
   Widget _buildnumberofemployees() {
     return new TudoNumberWidget(
       controller: _bspNumberOfEmployee,
-      prefixIcon: Icon(Icons.control_point_duplicate),
+      prefixIcon: Icon(Icons.people),
       labelText: AppConstantsValue.appConst['bspSignup']['numberofemployees']
           ['translation'],
       hintText: AppConstantsValue.appConst['bspSignup']['numberofemployees']
@@ -210,7 +215,7 @@ class _BspSignupPageState extends State<BspSignupPage>
       children: <Widget>[
         new Expanded(
           child: new TudoTextWidget(
-            prefixIcon: Icon(Icons.business),
+            prefixIcon: Icon(FontAwesomeIcons.mapMarkedAlt),
             labelText: AppConstantsValue.appConst['bspSignup']
                 ['businesslegaladdress']['translation'],
             hintText: AppConstantsValue.appConst['bspSignup']
@@ -237,6 +242,7 @@ class _BspSignupPageState extends State<BspSignupPage>
               LocationResult result = await LocationPicker.pickLocation(
                 context,
                 "AIzaSyDZZeGlIGUIPs4o8ahJE_yq6pJv3GhbKQ8",
+                requiredGPS: false
               );
               print("result = $result");
               setState(() {
@@ -267,7 +273,7 @@ class _BspSignupPageState extends State<BspSignupPage>
             builder: (FormFieldState<dynamic> field) {
               return InputDecorator(
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.perm_identity),
+                  prefixIcon: Icon(Icons.business_center),
                   labelText: _type == []
                       ? 'Select Personal Identification type'
                       : 'Business type',
@@ -285,6 +291,7 @@ class _BspSignupPageState extends State<BspSignupPage>
                       print('newValue');
                       print(newValue);
                       setState(() {
+                        _isEditMode = false;
                         _typeValue = newValue;
                         field.didChange(newValue);
                       });
@@ -376,29 +383,41 @@ class _BspSignupPageState extends State<BspSignupPage>
                 model.businessType = _typeValue['id'];
                 model.businessLegalAddress = _bspBusinessLegalAddress.text;
                 model.businessTypes = _typeValue;
+                model.countryId = _countryId;
                 print('model');
                 print(model.licensed);
-                if (_typeValue['name'].toLowerCase() ==
-                    "Licensed / Registered".toLowerCase()) {
-                  model.isLicensed = true;
+                if (_isEditMode) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BspLicensedSignupPage(
+                      builder: (context) => BusinessDetailsPage(
                         bspSignupCommonModel: model,
                       ),
                     ),
                   );
                 } else {
-                  model.isLicensed = false;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BspUnlicensedSignupPage(
-                        bspSignupCommonModel: model,
+                  if (_typeValue['name'].toLowerCase() ==
+                      "Licensed / Registered".toLowerCase()) {
+                    model.isLicensed = true;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BspLicensedSignupPage(
+                          bspSignupCommonModel: model,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    model.isLicensed = false;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BspUnlicensedSignupPage(
+                          bspSignupCommonModel: model,
+                        ),
+                      ),
+                    );
+                  }
                 }
               }
             },
@@ -453,6 +472,7 @@ class _BspSignupPageState extends State<BspSignupPage>
       onInit: (Store<AppState> store) {
         _countryCodeController.text =
             store.state.auth.loginUser.user.country.isdCode;
+        _countryId = int.parse(store.state.auth.loginUser.user.country.id);
       },
       builder: (BuildContext context, BspSignupViewModel bspSignupVm) =>
           content(context, bspSignupVm),

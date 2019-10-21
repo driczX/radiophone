@@ -26,15 +26,23 @@ class BspLicensedSignupTermsPage extends StatefulWidget {
 
 class _BspLicensedSignupTermsPageState
     extends State<BspLicensedSignupTermsPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isWalkIn = false;
   bool _isHome = false;
   bool _isOnDemand = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.bspSignupCommonModel.isHome != null) {
+      _isHome = widget.bspSignupCommonModel.isHome;
+      _isOnDemand = widget.bspSignupCommonModel.isOnDemand;
+      _isWalkIn = widget.bspSignupCommonModel.isWalkin;
+    } else {
+      print('I am in new mode');
+    }
+  }
 
   Widget _buildLogo() {
     return new Image(
@@ -60,6 +68,7 @@ class _BspLicensedSignupTermsPageState
 
   Widget _buildCustomerWalkIn() {
     return TudoConditionWidget(
+      intialValue: _isWalkIn,
       text: AppConstantsValue.appConst['bsplicensedsignupterms']
           ['CustomerWalkIn']['translation'],
       onChanged: (value) {
@@ -86,6 +95,7 @@ class _BspLicensedSignupTermsPageState
 
   Widget _buildCustomerInHome() {
     return TudoConditionWidget(
+      intialValue: _isWalkIn,
       text: AppConstantsValue.appConst['bsplicensedsignupterms']
           ['CustomerInHome']['translation'],
       onChanged: (value) {
@@ -112,6 +122,7 @@ class _BspLicensedSignupTermsPageState
 
   Widget _buildBusinessOnDemand() {
     return TudoConditionWidget(
+      intialValue: _isOnDemand,
       text: AppConstantsValue.appConst['bsplicensedsignupterms']
           ['BusinessOnDemand']['translation'],
       onChanged: (value) {
@@ -129,7 +140,7 @@ class _BspLicensedSignupTermsPageState
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
-      title: Text("Bsp Licensed Signup Terms and Condition"),
+      title: Text("BSP Services Types"),
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios),
         onPressed: () {

@@ -1,5 +1,3 @@
-import 'package:tudo/src/modules/bsp_signup/bsp_service/bsp_service_model.dart';
-
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:tudo/src/utils/gql_strings.dart';
 import 'package:tudo/src/utils/graphql_helper.dart';
@@ -7,20 +5,28 @@ import 'package:tudo/src/utils/graphql_helper.dart';
 class BspServiceRepository {
   BspServiceRepository();
 
-  Future<BspServices> getBspServices() async {
+  Future<dynamic> getBspServices(
+      int countryId, bool isHome, bool isOnDemand, bool isWalkIn) async {
     Map<String, dynamic> serviceRequestMap = {
       "serviceMeta": {
-        'countryId': 1,
-        'onDemand': true,
-        'walkIn': true,
+        'countryId': countryId,
+        'onDemand': isOnDemand,
+        'walkIn': isWalkIn,
       }
     };
-
+    print('serviceRequestMap');
+    print(serviceRequestMap);
     final QueryResult result = await GraphQLHelper.gqlQuery(
         GQLStrings.getBSPServicesGQLQuery(), serviceRequestMap);
     print('result.data.servicesByCountry');
-    print(result.data);
-    BspServices bspServices = BspServices.fromJson(result.data);
+
+    Map<String, dynamic> bspServices = {
+      'data': result.data,
+      'error': result.errors
+    };
     return bspServices;
+    // print(result.data);
+    // BspServices bspServices = BspServices.fromJson(result.data);
+    // return bspServices;
   }
 }

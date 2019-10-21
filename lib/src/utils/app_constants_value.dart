@@ -368,9 +368,9 @@ class AppConstantsValue {
       },
     },
     'licensedsignup': {
-      'licenseissuingauthority': {
+      'licenseissuingauthoritytype': {
         'id': 1,
-        'translation': 'License Issuing Authority'
+        'translation': 'License Issuing Authority Type'
       },
       'businesslicenseno': {
         'id': 2,
@@ -384,7 +384,11 @@ class AppConstantsValue {
       'labeluploadlicenpicture': {
         'id': 4,
         'translation': 'Upload business license pictures',
-      }
+      },
+      'licenseissuingauthority': {
+        'id': 5,
+        'translation': 'License Issuing Authority'
+      },
     },
     'businessprofile': {
       'uploadprofilepicture': {

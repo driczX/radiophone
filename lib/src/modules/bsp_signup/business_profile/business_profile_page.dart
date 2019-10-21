@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tudo/src/modules/bsp_signup/business_details/business_details_page.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_common_model.dart';
@@ -28,17 +28,18 @@ class BusinessProfilePage extends StatefulWidget {
   _BusinessProfilePageState createState() => _BusinessProfilePageState();
 }
 
-class _BusinessProfilePageState extends State<BusinessProfilePage> {
+class _BusinessProfilePageState extends State<BusinessProfilePage>
+    with AfterLayoutMixin<BusinessProfilePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _comment = TextEditingController();
-  String _businessSummary;
-  Future<File> _profilepicture;
+  Future<File> profilepicture;
   List<BusinessProfilePicture> _bspProfileImages =
       new List<BusinessProfilePicture>();
+  TimeOfDay time;
 
   pickprofilepicture(ImageSource source) {
     setState(() {
-      _profilepicture = ImagePicker.pickImage(source: source);
+      profilepicture = ImagePicker.pickImage(source: source);
     });
   }
 
@@ -54,6 +55,17 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
       images.add("Add Image");
       images.add("Add Image");
     });
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    print('I am in Profile Model');
+    print(widget.bspSignupCommonModel.licensed);
+    if (widget.bspSignupCommonModel.licensed != null) {
+      _comment.text = widget.bspSignupCommonModel.profileComment;
+    } else {
+      print('I am in new mode');
+    }
   }
 
   Widget _buildbusinessprofilepicture() {
@@ -131,12 +143,21 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
   }
 
   Widget _buildLogo() {
-    return new TudoLogoWidget();
+    return new Center(
+      child: TudoLogoWidget(),
+    );
   }
 
   Widget _buildlabeluploadprofilepicture() {
     return Text(AppConstantsValue.appConst['businessprofile']
         ['uploadprofilepicture']['translation']);
+  }
+
+  Widget _buildprofiletitle() {
+    return Text(
+      "Write your business profile",
+      textAlign: TextAlign.start,
+    );
   }
 
   Widget _buildcomment() {
@@ -147,11 +168,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
       child: TudoTextWidget(
         controller: _comment,
         maxLines: 9,
-        validator: (val) => val.isEmpty ? 'Please enter Comment' : null,
-        hintText: "Write your business profile!",
-        onSaved: (val) {
-          _businessSummary = val.trim();
-        },
+        validator: (val) =>
+            val.isEmpty ? 'Please enter business profile details' : null,
+        hintText:
+            "Note: Information entered here is visible to other TUDO users.",
+        onSaved: (val) {},
       ),
     );
   }
@@ -180,7 +201,13 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
           NavigationHelper.navigatetoBack(context);
         },
       ),
-      title: new Text("Business Profile"),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.help_outline),
+          onPressed: () {},
+        )
+      ],
+      title: new Text("BSP Profile"),
     );
     final bottomNavigationBar = Container(
       height: 56,
@@ -252,10 +279,11 @@ class _BusinessProfilePageState extends State<BusinessProfilePage> {
                       child: new Container(
                         margin: EdgeInsets.fromLTRB(10, 0, 10, 10),
                         child: new Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLogo(),
+                            _buildprofiletitle(),
                             _buildcomment(),
                             _buildlabeluploadprofilepicture(),
                             _buildbusinessprofilepicture(),

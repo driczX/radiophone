@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tudo/src/modules/bsp_signup/bsp_signup_page.dart';
-import 'package:tudo/src/modules/bsp_signup/business_details/business_details_page.dart';
 import 'package:tudo/src/modules/cmr_dashboard/cmr_main_screen.dart';
 
 class BusinessSetting extends StatefulWidget {
@@ -13,22 +12,22 @@ class _BusinessSettingState extends State<BusinessSetting> {
 
   void _onChanged(bool value) {
     print(value);
-    setState(() {
-      if (value == false) {
-        _value = false;
-      } else {
-        _value = true;
-      }
-    },);
+    setState(
+      () {
+        if (value == false) {
+          _value = false;
+        } else {
+          _value = true;
+        }
+      },
+    );
   }
 
   String data;
   @override
   Widget build(BuildContext context) {
-    bool _value1 = false;
     bool _value2 = false;
 
-    void _onChanged1(bool value) => setState(() => _value1 = value);
     void _onChanged2(bool value) => setState(() => _value2 = value);
 
     return new Scaffold(

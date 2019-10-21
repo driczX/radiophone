@@ -33,6 +33,7 @@ class BspSignupCommonModel {
   List<BusinessProfilePicture> businessProfilePictures;
   Map<String, dynamic> bspLicenseAuthorityType;
   Map<String, dynamic> businessTypes;
+  int countryId;
 
   BspSignupCommonModel({
     this.businessLegalName,
@@ -55,6 +56,7 @@ class BspSignupCommonModel {
     this.businessProfilePictures,
     this.bspLicenseAuthorityType,
     this.businessTypes,
+    this.countryId,
   });
 
   factory BspSignupCommonModel.fromJson(Map<String, dynamic> json) =>
@@ -111,6 +113,7 @@ class BspSignupCommonModel {
             : json["bsp_license_authority_type"],
         businessTypes:
             json["business_types"] == null ? null : json["business_types"],
+        countryId: json['country_id'] == null ? null : json['country_id'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -151,6 +154,7 @@ class BspSignupCommonModel {
         "bsp_license_authority_type":
             bspLicenseAuthorityType == null ? null : bspLicenseAuthorityType,
         "business_types": businessTypes == null ? null : businessTypes,
+        "country_id": countryId == null ? null : countryId,
       };
 }
 

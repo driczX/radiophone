@@ -14,15 +14,16 @@ class Validators {
     if (value.length == 0) {
       return "$type is Required";
     }
+    return null;
   }
 
   String validateMobile(String value) {
-    String patttern = r'(^\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4})$)';
+    String patttern = r'(^\(?([0-9]{3})\)?[-.●]?([0-9]{3})[-.●]?([0-9]{4,5})$)';
     RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
       return "Phone number is Required";
     } else if (!regExp.hasMatch(value)) {
-      return "Phone number is not valid!";
+      return "Phone number is not valid (Minimum 10 digits)";
     }
     return null;
   }
@@ -101,16 +102,9 @@ class Validators {
   }
 
   String validateLicenseno(String value) {
-    String patttern = r'(^[0-9]*$)';
-    RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
       return "License No is Required";
     }
-    //  else if (value.length != 12) {
-    //   return "License No must 12 digits";
-    // } else if (!regExp.hasMatch(value)) {
-    //   return "License No must be digits";
-    // }
     return null;
   }
 
@@ -128,8 +122,12 @@ class Validators {
   }
 
   String validatedate(String value) {
+    String patttern = r'([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))';
+    RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
-      return "Plase Select the Date";
+      return "Date is Required";
+    } else if (!regExp.hasMatch(value)) {
+      return "Please enter valid date";
     }
     return null;
   }

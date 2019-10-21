@@ -18,7 +18,8 @@ Store<AppState> createStore() {
   persistor.load().then((value) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String userString = preferences.getString('user');
-    if (userString != null) {
+    bool isRemember = preferences.getBool('rememberMe');
+    if (userString != null && isRemember != null && isRemember == true) {
       LoginUser userModel = loginUserFromJson(userString);
       String token = userModel.token;
       store.dispatch(

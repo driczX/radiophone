@@ -22,7 +22,6 @@ import 'package:tudo/src/utils/app_constants_value.dart';
 import 'package:tudo/src/utils/navigation_helper.dart';
 import 'package:tudo/src/utils/validator.dart';
 import 'package:tudo/src/widgets/fullscreenloader.dart';
-import 'package:tudo/src/widgets/loader.dart';
 import 'package:tudo/src/widgets/timer.dart';
 import 'package:tudo/src/widgets/tudo_button_widget/TudoPrimaryButtonWidget.dart';
 import 'package:tudo/src/widgets/tudo_custom_widget/TudoErrorDialog.dart';
@@ -40,7 +39,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 _launchURL() async {
-  const url = 'https://flutter.io';
+  // const url = 'https://flutter.io';
   // if (await canLaunch(url)) {
   //   await launch(url);
   // } else {
@@ -53,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _validate = false;
   List<Country> _countries = [];
   Person person = new Person();
-  var mobilecontroller = new MaskedTextController(mask: '(000)-000-0000');
+  var mobilecontroller = new MaskedTextController(mask: '(000)-000-00000');
   String passcode = '';
   final _emailFocusNode = new FocusNode();
   final _passwordFocusNode = new FocusNode();
@@ -528,6 +527,9 @@ class _SignupScreenState extends State<SignupScreen> {
             borderRadius: BorderRadius.circular(7),
           ),
           onPressed: () {
+            setState(() {
+              _validate = !_validate;
+            });
             _formKey.currentState.reset();
             _email.text = "";
             _email.clear();

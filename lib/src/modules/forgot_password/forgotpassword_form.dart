@@ -26,9 +26,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final _emailFocusNode = new FocusNode();
   SignupRepository _signupRepository = new SignupRepository();
   int _timerSecs = 300;
-  String _emailStr;
   String _newpasswordStr;
-  var onTapRecognizer;
   TextEditingController controller = TextEditingController();
   int pinLength = 6;
   String thisText = "";

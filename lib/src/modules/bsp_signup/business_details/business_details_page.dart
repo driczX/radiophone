@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
-// import 'package:http_parser/http_parser.dart';
 import 'package:graphql/utilities.dart';
 import 'package:redux/redux.dart';
 import 'package:tudo/src/modules/bsp_dashboard/bsp_main_screen.dart';
@@ -343,6 +342,12 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
   }
 
   Widget _buildBusinessLicenseDeails(BusinessDetailsViewModel bdVm) {
+    String authorityType = (widget
+            .bspSignupCommonModel.bspLicenseAuthorityType['name']
+            .toLowerCase()
+            .contains("other".toLowerCase()))
+        ? widget.bspSignupCommonModel.licensed[0].bspAuthority
+        : widget.bspSignupCommonModel.bspLicenseAuthorityType['name'];
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -405,7 +410,7 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
           ListTile(
             title: Text("License Issuing Authority"),
             subtitle: Text(
-              '${widget.bspSignupCommonModel.licensed[0].bspAuthority}',
+              '$authorityType',
             ),
             leading: Icon(FontAwesomeIcons.fileContract),
           ),
@@ -709,29 +714,12 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
       _isLoading = true;
     });
     List<MultipartFile> profileImages = [];
-    // List<File> profileImages = [];
     List<BusinessProfilePicture> bspPictures =
         widget.bspSignupCommonModel.businessProfilePictures;
 
     for (int i = 0; i < bspPictures.length; i++) {
-      // var byteData = bspPictures[i].imageFile.readAsBytesSync();
-      // print('byteData');
-      // print(byteData);
-      // var multipartFile = MultipartFile.fromBytes(
-      //   'photo',
-      //   byteData,
-      //   filename: '${DateTime.now().second}.jpg',
-      //   contentType: MediaType("image", "jpg"),
-      // );
-      // profileImages.add(multipartFile);
       var imageData = await multipartFileFrom(bspPictures[i].imageFile);
-      print('imageData');
-      print(imageData);
-      print(imageData);
       profileImages.add(imageData);
-      // profileImages.add(await multipartFileFrom(bspPictures[i].imageFile));
-      print('profileImages');
-      print(profileImages);
     }
 
     Map<String, dynamic> bspUserSignUpMap = {
@@ -780,56 +768,6 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
     }
   }
 
-  // Widget _stickyheader() {
-  //   return CustomScrollView(
-  //     shrinkWrap: true,
-  //     slivers: <Widget>[
-  //       SliverToBoxAdapter(
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(26.0),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: <Widget>[
-  //               Text("Good Morning",
-  //                   style: TextStyle(
-  //                       fontSize: 32,
-  //                       fontWeight: FontWeight.w800,
-  //                       color: Colors.white)),
-  //               Text("Everyone",
-  //                   style: TextStyle(
-  //                       fontSize: 32,
-  //                       fontWeight: FontWeight.w800,
-  //                       color: Colors.white)),
-  //               SizedBox(
-  //                 height: 40,
-  //               ),
-  //               Material(
-  //                 elevation: 5.0,
-  //                 borderRadius: BorderRadius.all(Radius.circular(30)),
-  //                 child: TextField(
-  //                   controller: TextEditingController(text: 'Search...'),
-  //                   cursorColor: Theme.of(context).primaryColor,
-  //                   style: TextStyle(color: Colors.black, fontSize: 18),
-  //                   decoration: InputDecoration(
-  //                       suffixIcon: Material(
-  //                         elevation: 2.0,
-  //                         borderRadius: BorderRadius.all(Radius.circular(30)),
-  //                         child: Icon(Icons.search),
-  //                       ),
-  //                       border: InputBorder.none,
-  //                       contentPadding:
-  //                           EdgeInsets.symmetric(horizontal: 25, vertical: 13)),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget content(BuildContext context, BusinessDetailsViewModel bdVm) {
     final appbar = AppBar(
       leading: IconButton(
@@ -863,85 +801,47 @@ class _BusinessDetailsPageState extends State<BusinessDetailsPage> {
     );
 
     return new Scaffold(
-        appBar: appbar,
-        bottomNavigationBar: bottomNavigationBar,
-        body: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              dragStartBehavior: DragStartBehavior.down,
-              child: new Container(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  children: <Widget>[
-                    _buildBusinessHeaders(bdVm),
-                    SizedBox(height: 20.0),
-                    _buildbusinessprofilepicture(),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    _buildBusinessOwnerDetails(bdVm),
-                    SizedBox(height: 20.0),
-                    _buildBusinessDetails(bdVm),
-                    SizedBox(height: 20.0),
-                    // _buildBusinessUnLicenseDeails(bdVm),
-                    widget.bspSignupCommonModel.isLicensed
-                        ? _buildBusinessLicenseDeails(bdVm)
-                        : _buildBusinessUnLicenseDeails(bdVm),
-                    // _buildBusinessLicenseDeails(bdVm),
-                    SizedBox(height: 20.0),
-                    _buildBusinessServiceDetails(),
-                    SizedBox(height: 20.0),
-                    _buildBusinessService(),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    _buildSelectedConsents(),
-                  ],
-                ),
+      appBar: appbar,
+      bottomNavigationBar: bottomNavigationBar,
+      body: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            dragStartBehavior: DragStartBehavior.down,
+            child: new Container(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: <Widget>[
+                  _buildBusinessHeaders(bdVm),
+                  SizedBox(height: 20.0),
+                  _buildbusinessprofilepicture(),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  _buildBusinessOwnerDetails(bdVm),
+                  SizedBox(height: 20.0),
+                  _buildBusinessDetails(bdVm),
+                  SizedBox(height: 20.0),
+                  // _buildBusinessUnLicenseDeails(bdVm),
+                  widget.bspSignupCommonModel.isLicensed
+                      ? _buildBusinessLicenseDeails(bdVm)
+                      : _buildBusinessUnLicenseDeails(bdVm),
+                  // _buildBusinessLicenseDeails(bdVm),
+                  SizedBox(height: 20.0),
+                  _buildBusinessServiceDetails(),
+                  SizedBox(height: 20.0),
+                  _buildBusinessService(),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  _buildSelectedConsents(),
+                ],
               ),
             ),
-            _isLoading ? FullScreenLoader() : SizedBox(),
-          ],
-        )
-
-        //  SingleChildScrollView(
-        //   child: Stack(
-        //     children: <Widget>[
-        //       Container(
-        //         margin: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-        //         child: Column(
-        //           children: <Widget>[
-        //             _buildBusinessHeaders(bdVm),
-        //             SizedBox(height: 20.0),
-        //             _buildbusinessprofilepicture(),
-        //             SizedBox(
-        //               height: 20.0,
-        //             ),
-        //             _buildBusinessOwnerDetails(bdVm),
-        //             SizedBox(height: 20.0),
-        //             _buildBusinessDetails(bdVm),
-        //             SizedBox(height: 20.0),
-        //             // widget.bspSignupCommonModel.isLicensed
-        //             // ? _buildBusinessLicenseDeails(bdVm)
-        //             // // : _buildBusinessUnLicenseDeails(bdVm),
-
-        //             _buildBusinessLicenseDeails(bdVm),
-        //             SizedBox(height: 20.0),
-        //             _buildBusinessServiceDetails(),
-        //             SizedBox(height: 20.0),
-        //             _buildBusinessService(),
-        //             SizedBox(
-        //               height: 20.0,
-        //             ),
-        //             _buildSelectedConsents(),
-        //           ],
-        //         ),
-        //       ),
-        //       _isLoading ? FullScreenLoader() : SizedBox(),
-        //     ],
-        //   ),
-        // ),
-        );
+          ),
+          _isLoading ? FullScreenLoader() : SizedBox(),
+        ],
+      ),
+    );
   }
 
   @override

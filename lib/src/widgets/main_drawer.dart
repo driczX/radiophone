@@ -7,6 +7,7 @@ import 'package:tudo/src/redux/models/app_state.dart';
 import 'package:tudo/src/redux/models/login_user.dart';
 import 'package:tudo/src/styles/colors.dart';
 import 'package:tudo/src/utils/app_constants_value.dart';
+import 'package:tudo/src/utils/navigation_helper.dart';
 
 class MainDrawer extends StatefulWidget {
   MainDrawer({Key key}) : super(key: key);
@@ -128,11 +129,13 @@ class _MainDrawerState extends State<MainDrawer> {
             onTap: () => print('you pressed Setting'),
           ),
           new ListTile(
-            leading: new Icon(Icons.room_service),
-            title: new Text(AppConstantsValue.appConst['maindrawer']
-                ['BusinessServiceProvider']['translation']),
-            onTap: () => print('you pressed Setting'),
-          ),
+              leading: new Icon(Icons.room_service),
+              title: new Text(AppConstantsValue.appConst['maindrawer']
+                  ['BusinessServiceProvider']['translation']),
+              onTap: () {
+                print('you pressed Bsp Flow turn on');
+                NavigationHelper.navigatetoBspsignupcreen(context);
+              }),
           new ListTile(
             leading: new Icon(Icons.notifications),
             title: new Text(AppConstantsValue.appConst['maindrawer']

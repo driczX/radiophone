@@ -70,12 +70,6 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   final List<TextEditingController> _issuingauthority = List();
   final List<List<Object>> _identificationpictures = List();
   Map<int, Widget> _myWidgetsMap = Map();
-  Map<int, TextEditingController> _documentControllersMap = Map();
-  Map<int, TextEditingController> _issuingauthoritytypeMap = Map();
-  Map<int, TextEditingController> _expiryDateMap = Map();
-  Map<int, TextEditingController> _issuingauthorityMap = Map();
-  Map<int, List<Object>> _identificationpicturesMap = Map();
-
   @override
   void initState() {
     super.initState();
@@ -91,64 +85,65 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   void _add() {
 // TextEditingController controller = TextEditingController();
     setState(() {
-      int keyValue = ++_index;
-      _myWidgetsMap[keyValue] = (Column(
-        key: Key("$keyValue"),
-        children: <Widget>[
-          SizedBox(height: 10),
-          Container(
-            padding: EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 15,
-                ),
-              ],
-            ),
-            child: Column(
-              children: <Widget>[
-                Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        child: Icon(Icons.close),
-                        onTap: () {
-                          print("CLose pressed");
-                          setState(() {
-                            _myWidgetsMap = Map.from(_myWidgetsMap)
-                              ..remove(keyValue);
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20,
+      int keyValue = _myWidgets.length;
+      _myWidgets = List.from(_myWidgets)
+        ..add(Column(
+          key: Key("$keyValue"),
+          children: <Widget>[
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 15,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: GestureDetector(
+                          child: Icon(Icons.close),
+                          onTap: () {
+                            print("CLose pressed");
+                            setState(() {
+                              _myWidgets = List.from(_myWidgets)
+                                ..removeAt(keyValue);
+                            });
+                          },
                         ),
-                        _buildidentificationtype1(keyValue),
-                        _builddocumentnumber1(keyValue),
-                        _builddate(keyValue),
-                        _isvisibleissuingauthority
-                            ? _buildissuingauthority1(keyValue)
-                            : SizedBox(),
-                        _buildidentificationpictures(keyValue),
-                      ],
-                    ),
-                  ],
-                )
-              ],
-            ),
-          )
-        ],
-      ));
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 20,
+                          ),
+                          _buildidentificationtype1(keyValue),
+                          _builddocumentnumber1(keyValue),
+                          _builddate(keyValue),
+                          _isvisibleissuingauthority
+                              ? _buildissuingauthority1(keyValue)
+                              : SizedBox(),
+                          _buildidentificationpictures(keyValue),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ));
     });
     setState(() => ++_index);
   }
@@ -164,9 +159,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _buildidentificationtype1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    // _issuingauthoritytype.add(controller);
-
-    _issuingauthoritytypeMap[keyValue] = controller;
+    _issuingauthoritytype.add(controller);
 
     return FormBuilder(
       autovalidate: autovalidate,
@@ -220,9 +213,8 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _builddocumentnumber1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    // _documentControllers.add(controller);
+    _documentControllers.add(controller);
 
-    _documentControllersMap[keyValue] = controller;
     return new TudoTextWidget(
       controller: controller,
       prefixIcon: Icon(FontAwesomeIcons.idCard),
@@ -242,9 +234,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _builddate(int keyValue) {
     TextEditingController controller = TextEditingController();
-    // _expiryDate.add(controller);
-
-    _expiryDateMap[keyValue] = controller;
+    _expiryDate.add(controller);
     return DateTimeField(
       format: format,
       autocorrect: true,
@@ -271,9 +261,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
 
   Widget _buildissuingauthority1(int keyValue) {
     TextEditingController controller = TextEditingController();
-    // _issuingauthority.add(controller);
-
-    _issuingauthorityMap[keyValue] = controller;
+    _issuingauthority.add(controller);
     return new TudoTextWidget(
       prefixIcon: Icon(FontAwesomeIcons.idCard),
       labelText: AppConstantsValue.appConst['unlicensedsignup']
@@ -322,9 +310,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     onTap: () {
                       setState(() {
                         images.replaceRange(index, index + 1, ['Add Image']);
-                        // _identificationpictures.add(images);
-
-                        _identificationpicturesMap[keyValue] = images;
+                        _identificationpictures.add(images);
                       });
                     },
                   ),
@@ -371,7 +357,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
   Widget _buildinformationislegitmate() {
     return TudoConditionWidget(
       text:
-          "Above entered Identity information is legitimate and accurate toList() my knowledge",
+          "Above entered Identity information is legitimate and accurate to my knowledge",
     );
   }
 
@@ -432,7 +418,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                 if (_formKey.currentState.validate()) {
                   List<Licensed> listOfLicenses = new List<Licensed>();
                   BspSignupCommonModel model = widget.bspSignupCommonModel;
-                  for (var i = 0; i < _myWidgetsMap.length; i++) {
+                  for (var i = 0; i < _myWidgets.length; i++) {
                     String document = _documentControllers[i].text;
                     String issuingAuthorityType = _issuingauthoritytype[i].text;
                     String expiryDate = _expiryDate[i].text;
@@ -443,7 +429,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                     print('ExpiryDate: $expiryDate');
                     print('IssuingAuthority: $issuingAuthority');
                     print('Picture: ${_identificationpictures.length}');
-                    print(_myWidgetsMap.length);
+                    print(_myWidgets.length);
                     Licensed licensed = new Licensed(
                       bspLicenseNumber: document,
                       bspAuthority: issuingAuthority,
@@ -500,7 +486,7 @@ class _BspUnlicensedSignupPageState extends State<BspUnlicensedSignupPage> {
                       child: SizedBox(
                         child: ListView(
                           padding: const EdgeInsets.all(18.0),
-                          children: _myWidgetsMap.values.toList(),
+                          children: _myWidgets,
                         ),
                       ),
                     ),

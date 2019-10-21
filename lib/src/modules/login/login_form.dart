@@ -143,7 +143,10 @@ class _LoginFormState extends State<LoginForm> {
             );
             SharedPreferences preferences =
                 await SharedPreferences.getInstance();
-            preferences.setString('user', loginUserToJson(userModel));
+            if (rememberMe) {
+              preferences.setString('user', loginUserToJson(userModel));
+              preferences.setBool('rememberMe', true);
+            }
             loginVm.loginMe(context, userModel);
           }
           setState(() {
