@@ -1,4 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tudo/src/app.dart';
+import 'package:radiophone/src/app.dart';
 
-void main() => runApp(TudoApp());
+void main() => runApp(RadioPhoneApp());

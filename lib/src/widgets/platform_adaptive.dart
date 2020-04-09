@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tudo/src/styles/colors.dart';
+import 'package:radiophone/src/style/colors.dart';
+
 
 final ThemeData kIOSTheme = new ThemeData(
   primarySwatch: colorStyles['primary'],
